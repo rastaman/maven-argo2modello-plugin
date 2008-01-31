@@ -20,7 +20,7 @@
   <groupId>com.ubikproducts.maven.plugins</groupId>
   <artifactId>maven-argo2modello-plugin</artifactId>
   <packaging>maven-plugin</packaging>
-  <name>ArgoUML tp Modello Maven plugin</name>
+  <name>ArgoUML to Modello Maven plugin</name>
   <version>1.0</version>
   <url>http://maven-argo2modello-plugin.tigris.org</url>
   <build>
