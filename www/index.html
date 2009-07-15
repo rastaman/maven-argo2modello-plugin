@@ -42,17 +42,45 @@
 <p>The plugin target the following softwares:</p>
 
 <ul>
-<li>Modello (1.0-alpha-19-SNAPSHOT)</li>
-<li>ArgoUML (0.25.4 binary)</li>
+<li>Modello (1.0.1) (+ unreleased patchs for supporting annotations and default imports. The plugin cannot function without these patchs applied!)</li>
+<li>ArgoUML (0.28 - trunk)</li>
 <!-- 
 <li>You can add a "Highlights:" line to the top of all web pages by adding a file www/project_highlights.html </li>
  -->
 </ul>
-<!-- 
+
 <h3>Mission</h3>
 
 <p>This plugin convert UML model to Modello models at the <strong>process-sources</strong> phase.</p>
 
+<p>Here is a sample usage:</p>
+<pre>
+&lt;project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd"&gt;
+...
+  &lt;build&gt;
+    &lt;plugins&gt;
+      &lt;plugin&gt;
+        &lt;groupId&gt;com.ubikproducts.maven.plugins&lt;/groupId&gt;
+        &lt;artifactId&gt;maven-argo2modello-plugin&lt;/artifactId&gt;
+        &lt;executions&gt;
+          &lt;execution&gt;
+            &lt;id&gt;generate-modello&lt;/id&gt;
+            &lt;phase&gt;generate-sources&lt;/phase&gt;
+            &lt;goals&gt;
+              &lt;goal&gt;generate-modello&lt;/goal&gt;
+            &lt;/goals&gt;
+          &lt;/execution&gt;
+        &lt;/executions&gt;
+        &lt;configuration&gt;
+          &lt;sourceModel&gt;src/main/models/users.uml&lt;/sourceModel&gt;
+          &lt;destinationModel&gt;src/main/models/users.mdo&lt;/destinationModel&gt;
+          &lt;defaultImports&gt;javax.persistence.*,javax.xml.bind.annotation.*&lt;/defaultImports&gt;
+        &lt;/configuration&gt;
+      &lt;/plugin&gt;
+...
+</pre>
+<!-- 
 p>What is the scope of this project?
 </p>
 
@@ -108,5 +136,15 @@ any existing project that you can partner with or reuse?</li>
 <li>Where would you go to try to find potential contibutors?</li>
 </ul>
  -->
+<h3>Todos</h3>
+
+<p>The plugin should support the following features for the version 1.0 to be released:</p>
+<ul>
+<li>inheritance</li>
+<li>interfaces</li>
+<li>methods and methods body</li>
+<li>inplace of update of existing modello files</li>
+<li>roundtrip editing (with the help of the modello-uml-plugin)</li>
+</ul>
 </body>
 </html>

@@ -1,0 +1,56 @@
+<model>
+  <id>tmp</id>
+  <name>Modello Test Model with tmp</name>
+  <defaults>
+    <default>
+      <key>package</key>
+      <value>com.jsonapps.db.model</value>
+    </default>
+    <default>
+      <key>defaultImports</key>
+      <value>javax.persistence.Column,javax.persistence.Entity,javax.persistence.GeneratedValue,javax.persistence.GenerationType,javax.persistence.Id,javax.persistence.SequenceGenerator,javax.persistence.Table,javax.persistence.UniqueConstraint,javax.xml.bind.annotation.XmlRootElement</value>
+    </default>
+  </defaults>
+  <classes>
+    <class rootElement="true">
+      <name>Param</name>
+      <version>1.0.0</version>
+      <annotations>
+        <annotation>@XmlRootElement</annotation>
+        <annotation>@Entity</annotation>
+        <annotation>@Table(name="params",uniqueConstraints={@UniqueConstraint(columnNames="param_id"),@UniqueConstraint(columnNames="param_name")})</annotation>
+      </annotations>
+      <fields>
+        <field>
+          <name>id</name>
+          <version>1.0.0</version>
+          <required>true</required>
+          <type>int</type>
+          <identifier>true</identifier>
+          <annotations>
+            <annotation>@Id</annotation>
+            <annotation>@SequenceGenerator(name="param_seq", sequenceName="param_pk_seq")</annotation>
+            <annotation>@GeneratedValue(strategy=GenerationType.SEQUENCE, generator="param_seq")</annotation>
+            <annotation>@Column(name="param_id")</annotation>
+          </annotations>
+        </field>
+        <field>
+          <name>name</name>
+          <version>1.0.0</version>
+          <type>String</type>
+          <annotations>
+            <annotation>@Column(name="param_name")</annotation>
+          </annotations>
+        </field>
+        <field>
+          <name>value</name>
+          <version>1.0.0</version>
+          <type>String</type>
+          <annotations>
+            <annotation>@Column(name="param_value")</annotation>
+          </annotations>
+        </field>
+      </fields>
+    </class>
+  </classes>
+</model>
