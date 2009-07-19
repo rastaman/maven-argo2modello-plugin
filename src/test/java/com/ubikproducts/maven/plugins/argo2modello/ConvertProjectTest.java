@@ -28,39 +28,41 @@ import org.apache.maven.plugin.MojoExecutionException;
 public class ConvertProjectTest
     extends TestCase
 {
-	private String testModel = "users"; // users
-	
-    private File sourceModel = new File("src/test/resources/uml/"+testModel+".uml");
-    
-    private File destinationModel = new File("target/"+testModel+".mdo");
+    private String testModel = "users"; // users
 
-    private File javaProfile = new File("src/main/profiles/default-java.xmi");
-    
+    private File sourceModel = new File( "src/test/resources/uml/" + testModel + ".uml" );
+
+    private File destinationModel = new File( "target/" + testModel + ".mdo" );
+
+    private File javaProfile = new File( "src/main/profiles/default-java.xmi" );
+
     private String defaultImports = "javax.persistence.*,javax.xml.bind.annotation.*";
-    
+
     /**
      * The default implementation to start.
      */
-    private static final String DEFAULT_MODEL_IMPLEMENTATION =
-        "org.argouml.model.mdr.MDRModelImplementation";
+    private static final String DEFAULT_MODEL_IMPLEMENTATION = "org.argouml.model.mdr.MDRModelImplementation";
 
     private Logger log = Logger.getLogger( ConvertProjectTest.class );
-    
-    public void testConvert() {
+
+    public void testConvert()
+    {
         DOMConfigurator.configure( "src/test/resources/log4j.xml" );
         Argo2ModelloMojo plugin = new Argo2ModelloMojo();
-        plugin.setDestinationModel(destinationModel);
-        plugin.setSourceModel(sourceModel);
-        plugin.setJavaProfile(javaProfile);
-        plugin.setDefaultImports(defaultImports);
-        try {
-			plugin.execute();
-		} catch (MojoExecutionException e) {
-			e.printStackTrace();
-			fail(e.getMessage());
-		}
-		assertTrue(destinationModel.exists());
+        plugin.setDestinationModel( destinationModel );
+        plugin.setSourceModel( sourceModel );
+        plugin.setJavaProfile( javaProfile );
+        plugin.setDefaultImports( defaultImports );
+        try
+        {
+            plugin.execute();
+        }
+        catch ( MojoExecutionException e )
+        {
+            e.printStackTrace();
+            fail( e.getMessage() );
+        }
+        assertTrue( destinationModel.exists() );
     }
-
 
 }
