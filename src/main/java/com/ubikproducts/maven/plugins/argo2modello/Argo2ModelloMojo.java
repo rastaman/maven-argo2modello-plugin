@@ -41,6 +41,8 @@ import org.argouml.support.ArgoUMLStarter;
 import org.argouml.support.GeneratorJava2;
 import org.jdom.Document;
 import org.jdom.Element;
+import org.jdom.JDOMException;
+import org.jdom.input.SAXBuilder;
 import org.jdom.output.Format;
 import org.jdom.output.XMLOutputter;
 import org.jdom.output.Format.TextMode;
@@ -76,6 +78,14 @@ public class Argo2ModelloMojo
     private File javaProfile;
 
     /**
+     * Force the generation of the Modello model. Else the modello model is regenerated only when the UML file has
+     * changed (last modification time has changed).
+     * 
+     * @parameter expression=false
+     */
+    private boolean force;
+
+    /**
      * Default imports to set in Modello model. Used for instance to add the packages for annotations.
      * 
      * @parameter
@@ -94,6 +104,31 @@ public class Argo2ModelloMojo
     public void execute()
         throws MojoExecutionException
     {
+
+        if ( !sourceModel.exists() )
+            throw new MojoExecutionException( "Source model '" + sourceModel.getAbsolutePath() + "' doesn't exist!" );
+
+        if ( destinationModel.exists() && !force)
+        {
+            try
+            {
+                Document doc = new SAXBuilder().build( destinationModel );
+                String oldLastModified = doc.getRootElement().getAttributeValue( "uml.lastModified" );
+                String newLastModified = "" + sourceModel.lastModified();
+                if ( oldLastModified.equals( newLastModified ) )
+                    return;
+            }
+            catch ( JDOMException e )
+            {
+                throw new MojoExecutionException( "Error reading current destination model '"
+                    + destinationModel.getAbsolutePath() + "': " + e.getMessage() );
+            }
+            catch ( IOException e )
+            {
+                throw new MojoExecutionException( "Error reading current destination model '"
+                    + destinationModel.getAbsolutePath() + "': " + e.getMessage() );
+            }
+        }
 
         if ( !Model.isInitiated() )
         {
@@ -131,6 +166,8 @@ public class Argo2ModelloMojo
         Facade facade = Model.getFacade();
         Document doc = new Document();
         Element rootElement = new Element( "model" );
+        rootElement.setAttribute( "uml.lastModified", "" + sourceModel.lastModified() );
+
         doc.setRootElement( rootElement );
         addTaggedValues( m, rootElement );
         addElement( rootElement, "name", facade.getName( m ) );
@@ -553,5 +590,21 @@ public class Argo2ModelloMojo
     public void setDefaultImports( String defaultImports )
     {
         this.defaultImports = defaultImports;
+    }
+
+    /**
+     * @return the force
+     */
+    public boolean isForce()
+    {
+        return force;
+    }
+
+    /**
+     * @param force the force to set
+     */
+    public void setForce( boolean force )
+    {
+        this.force = force;
     }
 }
