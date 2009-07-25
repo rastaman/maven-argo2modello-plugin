@@ -115,7 +115,7 @@ public class Argo2ModelloMojo
                 Document doc = new SAXBuilder().build( destinationModel );
                 String oldLastModified = doc.getRootElement().getAttributeValue( "uml.lastModified" );
                 String newLastModified = "" + sourceModel.lastModified();
-                if ( oldLastModified.equals( newLastModified ) )
+                if ( oldLastModified != null && oldLastModified.equals( newLastModified ) )
                     return;
             }
             catch ( JDOMException e )
