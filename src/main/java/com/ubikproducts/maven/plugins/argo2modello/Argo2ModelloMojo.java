@@ -302,9 +302,12 @@ public class Argo2ModelloMojo
                 Object attr = jt.next();
                 Element elemField = addElement( fields, "field" );
                 addElement( elemField, "name", facade.getName( attr ) );
-                log.info( "Add " + facade.getName( attr ) + " with " + facade.getName( facade.getType( attr ) ) );
-                if ( facade.getType( attr ) != null )
+                if ( facade.getType( attr ) != null ) {
+                    log.info( "Add " + facade.getName( attr ) + " with " + facade.getName( facade.getType( attr ) ) );
                     addElement( elemField, "type", facade.getName( facade.getType( attr ) ) );
+                } else {
+                    log.info( "Cannot add attr " + facade.getName( attr ) + " with no type for " + attr );                	
+                }
                 // if not default case
                 addVisibility( attr, elemField );
                 addTaggedValues( attr, elemField );
