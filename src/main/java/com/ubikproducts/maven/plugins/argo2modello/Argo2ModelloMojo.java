@@ -419,6 +419,8 @@ public class Argo2ModelloMojo
                 Object otherAssociationEnd = facade.getNextEnd( associationEnd );
                 if ( !facade.isNavigable( otherAssociationEnd ) )
                     continue;
+                String otherEndName = facade.getName(associationEnd);
+                String otherTypeName = facade.getName(facade.getType(associationEnd));
                 String endName = facade.getName( otherAssociationEnd );
                 String typeName = facade.getName( facade.getType( otherAssociationEnd ) );
                 if ( "".equals( endName ) || endName == null )
@@ -466,7 +468,11 @@ public class Argo2ModelloMojo
         {
             tag = it.next();
             name = facade.getTag( tag );
-            if ( "documentation".equals( name ) )
+            if ( name == null )
+            {
+            	log.info( "No name for tagged value '"+ tag + "' with value '"+ facade.getValue( tag ) + "'" );
+            }
+            else if ( "documentation".equals( name ) )
             {
                 addElement( e, "description", facade.getValueOfTag( tag ) );
             }
@@ -491,7 +497,11 @@ public class Argo2ModelloMojo
             }
             else
             {
-                e.setAttribute( name, facade.getValueOfTag( tag ) );
+                try {
+					e.setAttribute( name, facade.getValueOfTag( tag ) );
+				} catch (Exception e1) {
+					log.warn( "Cannot set name to " + name + ": " + e1.getMessage() );
+				}
             }
         }
         if ( annotations.getChildren().size() > 0 )
