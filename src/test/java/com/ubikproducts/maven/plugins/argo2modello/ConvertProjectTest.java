@@ -28,7 +28,7 @@ import org.apache.maven.plugin.MojoExecutionException;
 public class ConvertProjectTest
     extends TestCase
 {
-    private String testModel = "users"; // users
+    private String testModel = "users";
 
     private File sourceModel = new File( "src/test/resources/uml/" + testModel + ".uml" );
 
@@ -38,13 +38,21 @@ public class ConvertProjectTest
 
     private String defaultImports = "javax.persistence.*,javax.xml.bind.annotation.*";
 
+    private boolean force = true;
+    
     /**
      * The default implementation to start.
      */
     private static final String DEFAULT_MODEL_IMPLEMENTATION = "org.argouml.model.mdr.MDRModelImplementation";
 
-    private Logger log = Logger.getLogger( ConvertProjectTest.class );
+    private Logger log = Logger.getLogger( this.getClass() );
 
+    protected void initModelFiles()
+    {
+        sourceModel = new File( "src/test/resources/uml/" + testModel + ".uml" );
+        destinationModel = new File( "target/" + testModel + ".mdo" );    	
+    }
+    
     public void testConvert()
     {
         DOMConfigurator.configure( "src/test/resources/log4j.xml" );
@@ -53,6 +61,7 @@ public class ConvertProjectTest
         plugin.setSourceModel( sourceModel );
         plugin.setJavaProfile( javaProfile );
         plugin.setDefaultImports( defaultImports );
+        plugin.setForce(force);
         try
         {
             plugin.execute();
@@ -64,5 +73,45 @@ public class ConvertProjectTest
         }
         assertTrue( destinationModel.exists() );
     }
+
+	public String getTestModel() {
+		return testModel;
+	}
+
+	public void setTestModel(String testModel) {
+		this.testModel = testModel;
+	}
+
+	public File getSourceModel() {
+		return sourceModel;
+	}
+
+	public void setSourceModel(File sourceModel) {
+		this.sourceModel = sourceModel;
+	}
+
+	public File getDestinationModel() {
+		return destinationModel;
+	}
+
+	public void setDestinationModel(File destinationModel) {
+		this.destinationModel = destinationModel;
+	}
+
+	public String getDefaultImports() {
+		return defaultImports;
+	}
+
+	public void setDefaultImports(String defaultImports) {
+		this.defaultImports = defaultImports;
+	}
+
+	protected void out( String s ) {
+		System.out.println( s );
+	}
+
+	protected void err( String s ) {
+		System.err.println( s );
+	}
 
 }

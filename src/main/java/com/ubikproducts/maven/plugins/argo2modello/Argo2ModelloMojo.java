@@ -19,11 +19,16 @@ package com.ubikproducts.maven.plugins.argo2modello;
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Iterator;
+import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
+import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
 import org.apache.maven.plugin.AbstractMojo;
 import org.apache.maven.plugin.MojoExecutionException;
@@ -39,6 +44,7 @@ import org.argouml.profile.ProfileFacade;
 import org.argouml.profile.internal.ProfileManagerImpl;
 import org.argouml.support.ArgoUMLStarter;
 import org.argouml.support.GeneratorJava2;
+import org.codehaus.modello.model.ModelDefault;
 import org.jdom.Document;
 import org.jdom.Element;
 import org.jdom.JDOMException;
@@ -92,6 +98,8 @@ public class Argo2ModelloMojo
      */
     private String defaultImports;
 
+    private List<TaggedValueHandler> taggedValuesHandlers = new ArrayList<TaggedValueHandler>();
+    
     // temp caches
     private Map interfacesMap = new HashMap();
 
@@ -99,6 +107,8 @@ public class Argo2ModelloMojo
 
     private GeneratorJava2 generator = new GeneratorJava2();
 
+    private Map allClasses;
+    
     private Logger log = Logger.getLogger( Argo2ModelloMojo.class );
 
     public void execute()
@@ -201,6 +211,30 @@ public class Argo2ModelloMojo
             addInheritance( inf, elemInf );
         }
         // classes
+        //1st pass - collection types names
+        it = Model.getCoreHelper().getAllClasses( m ).iterator();
+        allClasses = new HashMap();
+        while ( it.hasNext() )
+        {
+        	Object clazz = it.next();
+        	String name = facade.getName( clazz );
+        	if ( !allClasses.containsKey( name ))
+        	{
+        		allClasses.put( name, clazz );
+        	} else {
+        		if ( allClasses.get( name ) instanceof List )
+        		{
+        			List l = (List) allClasses.get(name);
+        			l.add( clazz );
+        		} else {
+        			Object prevClazz = allClasses.get(name);
+        			List l = new ArrayList();
+        			l.add(prevClazz);
+        			l.add(clazz);
+        			allClasses.put(name, l);
+        		}
+        	}
+        }
         Element classes = addElement( rootElement, "classes" );
         it = Model.getCoreHelper().getAllClasses( m ).iterator();
         while ( it.hasNext() )
@@ -243,12 +277,12 @@ public class Argo2ModelloMojo
 
     // XML Content generation
 
-    private Element addElement( Element e, String n )
+    public Element addElement( Element e, String n )
     {
         return addElement( e, n, null );
     }
 
-    private Element addElement( Element e, String n, String s )
+    public Element addElement( Element e, String n, String s )
     {
         Facade facade = Model.getFacade();
         Element child = new Element( n );
@@ -289,9 +323,12 @@ public class Argo2ModelloMojo
         }
     }
 
+    private Map<String,Set<String>> fieldsForClasses = new HashMap<String,Set<String>>();
+    
     public void addFields( Object clazz, Element elemClazz )
     {
         Facade facade = Model.getFacade();
+        String clazzName = getFullName(clazz);
         Collection fieldsUml = facade.getStructuralFeatures( clazz );
         if ( !fieldsUml.isEmpty() )
         {
@@ -302,9 +339,27 @@ public class Argo2ModelloMojo
                 Object attr = jt.next();
                 Element elemField = addElement( fields, "field" );
                 addElement( elemField, "name", facade.getName( attr ) );
+                
+                if (fieldsForClasses.get(clazzName) == null)
+                	fieldsForClasses.put(clazzName, new HashSet<String>());
+                fieldsForClasses.get(clazzName).add(facade.getName( attr ).toUpperCase());
+                
                 if ( facade.getType( attr ) != null ) {
-                    log.info( "Add " + facade.getName( attr ) + " with " + facade.getName( facade.getType( attr ) ) );
-                    addElement( elemField, "type", facade.getName( facade.getType( attr ) ) );
+/*
+ *           <association>
+            <type>ContentTest</type>
+            <multiplicity>1</multiplicity>
+          </association>                	
+ */
+                	String type = facade.getName( facade.getType( attr ) ).trim();
+                    log.info( "Add " + facade.getName( attr ) + " with " + type );                    
+                    if ( !allClasses.containsKey(type) || ModelDefault.isBaseType(type))
+                    	addElement( elemField, "type", type );
+                    else {
+                    	Element monoAssoc = addElement(elemField, "association");
+                    	addElement(monoAssoc,"type", type);
+                    	addElement(monoAssoc, "multiplicity", "1");
+                    }
                 } else {
                     log.info( "Cannot add attr " + facade.getName( attr ) + " with no type for " + attr );                	
                 }
@@ -353,25 +408,47 @@ public class Argo2ModelloMojo
 
     public void addOperations( Object cls, Element elemClazz )
     {
-
+    	Facade facade = Model.getFacade();
+    	String clazzName = facade.getName(cls);
         // add operations
         // TODO: constructors
-        Collection bFeatures = Model.getFacade().getOperations( cls );
-
+        Collection bFeatures = facade.getOperations( cls );
+        
         if ( !bFeatures.isEmpty() )
         {
             String tv;
             Element operations = addElement( elemClazz, "codeSegments" );
             for ( Object behavioralFeature : bFeatures )
             {
-                StringBuffer sb = new StringBuffer();
+            	String name = facade.getName( behavioralFeature );
+            	boolean getterOrSetter = false;
+            	if (name.startsWith("get")) {
+            		name = name.substring("get".length());
+            		getterOrSetter = true;
+            	}
+            	else if (name.startsWith("set"))
+            	{
+            		name = name.substring("set".length());
+            		getterOrSetter = true;
+            	}
+            	else if (name.startsWith("is"))
+            	{
+            		name = name.substring("is".length());
+            		getterOrSetter = true;
+            	}
+            	if (getterOrSetter) {
+            		Set<String> fields = fieldsForClasses.get(getFullName(cls));
+            		if (fields != null && fields.contains(name.toUpperCase()))
+            			continue;
+            	}            		
+            	StringBuffer sb = new StringBuffer();
                 sb.append( GeneratorJava2.INDENT );
                 sb.append( generator.generateOperation( behavioralFeature, false ) );
 
                 tv = generator.generateTaggedValues( behavioralFeature );
 
-                if ( ( Model.getFacade().isAClass( cls ) ) && ( Model.getFacade().isAOperation( behavioralFeature ) )
-                    && ( !Model.getFacade().isAbstract( behavioralFeature ) ) )
+                if ( ( facade.isAClass( cls ) ) && ( facade.isAOperation( behavioralFeature ) )
+                    && ( !facade.isAbstract( behavioralFeature ) ) )
                 {
                     sb.append( ' ' );
                     sb.append( '{' );
@@ -456,7 +533,12 @@ public class Argo2ModelloMojo
         }
     }
 
-    private void addTaggedValues( Object o, Element e )
+    /**
+     * Add tagged values from the UML model object o to the Modello class element for this object.
+     * @param o The UML model object
+     * @param e The Modello class element
+     */
+    public void addTaggedValues( Object o, Element e )
     {
         Facade facade = Model.getFacade();
         Object tag;
@@ -486,8 +568,40 @@ public class Argo2ModelloMojo
             }
             else if ( "version".equals( name ) )
             {
-                seenVersion = true;
-                addElement( e, "version", facade.getValueOfTag( tag ) );
+            	String version = null;
+                try {
+                	version = StringUtils.strip( facade.getValueOfTag( tag ) );
+                    String[] splittedVersion = StringUtils.split( version, "." );
+					if ( splittedVersion.length > 3 )
+					{
+					    throw new Exception();
+					}
+
+					String majorString = splittedVersion[0];
+					String minorString = "0";
+					String microString = "0";
+					if ( splittedVersion.length > 1 )
+					{
+					    minorString = splittedVersion[1];
+					    if ( splittedVersion.length > 2 )
+					    {
+					        microString = splittedVersion[2];
+					    }
+					}
+					try
+					{
+					    short major = Short.parseShort( majorString );
+					    short minor = Short.parseShort( minorString );
+					    short micro = Short.parseShort( microString );
+					}
+					catch ( NumberFormatException e1 )
+					{
+					    throw new Exception();
+					}
+					addElement( e, "version", version );
+				} catch (Exception e1) {
+					log.warn("Discarding non-standard version "+version);
+				}
             }
             else if ( "@".equals( name.substring( 0, 1 ) ) )
             {
@@ -510,6 +624,25 @@ public class Argo2ModelloMojo
             addElement( e, "version", "1.0.0" );
     }
 
+    protected boolean isTaggedValueHandled( Object taggedValue )
+    {
+    	for ( TaggedValueHandler tvh : taggedValuesHandlers )
+    	{
+    		if ( tvh.accept( taggedValue ) )
+    			return true;
+    	}
+    	return false;
+    }
+    
+    protected void handleTaggedValue( Object taggedValue, Element classElement )
+    {
+    	for ( TaggedValueHandler tvh : taggedValuesHandlers )
+    	{
+    		if ( tvh.accept( taggedValue ) )
+    			tvh.handle(taggedValue, classElement);
+    	}    	
+    }
+    
     // ArgoUML initialization
 
     /**
@@ -541,6 +674,12 @@ public class Argo2ModelloMojo
         return packagePath;
     }
 
+    public String getFullName(Object cls)
+    {    	
+    	Facade f = Model.getFacade();
+    	return getPackageName( f.getNamespace( cls ) ) + '.' + f.getName(cls);
+    }
+    
     /**
      * @return the destinationModel
      */

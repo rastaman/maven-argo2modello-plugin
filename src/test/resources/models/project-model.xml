@@ -1,0 +1,168 @@
+<model xsd.namespace="http://www.ubik-products.com/xsd/ubik-svnauthz/1.0"
+    xsd.target-namespace="http://www.ubik-products.com/xsd/ubik-svnauthz/1.0"
+    jpox.column-prefix="svnauthz_"
+    jpox.table-prefix="svnauthz_">
+  <id>ubik-svnauthz-model</id>
+  <name>SvnAuthz</name>
+  <description>Ubik SVNAuthz Model</description>
+  <version>1.0.0</version>
+  <defaults>
+    <default>
+      <key>package</key>
+      <value>com.ubikproducts.svnauthz.model</value>
+    </default>
+  </defaults>
+  <classes>
+    <class stash.storable="true" rootElement="true" xml.tagName="svnConfiguration">
+      <name>SvnConfiguration</name>
+      <fields>
+      <field>
+        <name>userFile</name>
+        <association xml.listStyle="wrapped">
+          <type>SvnUsersFile</type>
+          <multiplicity>1</multiplicity>
+        </association>
+      </field>
+      <field>
+        <name>accessFile</name>
+        <association xml.listStyle="wrapped">
+          <type>SvnAccessFile</type>
+          <multiplicity>1</multiplicity>
+        </association>
+      </field>
+      </fields>
+    </class>  
+    <class stash.storable="true" xml.tagName="svnAccessFile">
+      <name>SvnAccessFile</name>
+      <fields>
+        <field>
+          <name>name</name>
+          <description>Svn configuration name</description>
+          <type>String</type>
+        </field>      
+        <field>
+          <name>filename</name>
+          <description>File location</description>
+          <type>String</type>
+        </field>
+        <field>
+          <name>groups</name>
+          <association xml.listStyle="wrapped">
+            <type>SvnUserGroup</type>
+            <multiplicity>*</multiplicity>
+          </association>
+        </field>      
+        <field>
+          <name>paths</name>
+          <association xml.listStyle="wrapped">
+            <type>SvnPath</type>
+            <multiplicity>*</multiplicity>
+          </association>
+        </field>
+      </fields>
+    </class>
+    <class stash.storable="true" xml.tagName="svnUsersFile">
+      <name>SvnUsersFile</name>
+      <fields>
+        <field>
+          <name>name</name>
+          <description>Svn users file name</description>
+          <type>String</type>
+        </field>
+        <field>
+          <name>filename</name>
+          <description>File location</description>
+          <type>String</type>
+        </field>
+        <field>
+          <name>users</name>
+          <association xml.listStyle="wrapped">
+            <type>SvnUser</type>
+            <multiplicity>*</multiplicity>
+          </association>
+        </field>      
+      </fields>
+    </class>    
+    <class stash.storable="true" xml.tagName="user">
+      <name>SvnUser</name>
+      <fields>
+        <field>
+          <name>name</name>
+          <description>User login.</description>
+          <type>String</type>
+        </field>
+        <field>
+          <name>passwd</name>
+          <description>User password.</description>
+          <type>String</type>
+        </field>
+        <field>
+          <name>email</name>
+          <description>User email.</description>
+          <type>String</type>
+        </field>
+      </fields>
+    </class>
+    <class stash.storable="true" xml.tagName="group">
+      <name>SvnUserGroup</name>
+      <fields>
+        <field>
+          <name>name</name>
+          <description>Group name</description>
+          <type>String</type>
+        </field>
+        <field>
+          <name>users</name>
+          <association xml.listStyle="wrapped">
+            <type>SvnUser</type>
+            <multiplicity>*</multiplicity>
+          </association>
+        </field>                
+      </fields>
+    </class>    
+    <class stash.storable="true" xml.tagName="path">
+      <name>SvnPath</name>
+      <fields>
+        <field>
+          <name>repositoryId</name>
+          <type>String</type>
+        </field>
+        <field>
+          <name>path</name>
+          <type>String</type>
+        </field>
+        <field>
+          <name>authorizations</name>
+          <association xml.listStyle="wrapped">
+            <type>SvnAccess</type>
+            <multiplicity>*</multiplicity>
+          </association>
+        </field>
+      </fields>
+    </class>
+    <class stash.storable="true" xml.tagName="access">
+      <name>SvnAccess</name>
+      <fields>
+        <field>
+          <name>path</name>
+          <type>String</type>
+        </field>
+        <field>
+          <name>read</name>
+          <type>boolean</type>
+          <required>true</required>
+        </field>
+        <field>
+          <name>write</name>
+          <type>boolean</type>
+          <required>true</required>
+        </field>  
+        <field>
+          <name>groupId</name>
+          <type>String</type>
+          <required>true</required>
+        </field>
+      </fields>
+    </class>
+  </classes>
+</model>
