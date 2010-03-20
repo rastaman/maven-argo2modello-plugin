@@ -184,7 +184,7 @@ public class Argo2ModelloMojo
         Element defaults = addElement( rootElement, "defaults" );
         if ( defaultImports != null && !"".equals( defaultImports ) )
         {
-            Element defaultImportsElement = addElement( defaults, "default" );
+            Element defaultImportsElement = addElement( defaults, "default" );            
             addElement( defaultImportsElement, "key", "defaultImports" );
             addElement( defaultImportsElement, "value", defaultImports );
         }
@@ -240,11 +240,14 @@ public class Argo2ModelloMojo
         while ( it.hasNext() )
         {
             Object clazz = it.next();
+            String pkgName = getPackageName( facade.getNamespace( clazz ) );
+            if (pkgName.startsWith("java."))
+            	continue;
             if ( !seenPkg )
             {
                 seenPkg = true;
-                addElement( pkgDef, "value", facade.getName( facade.getNamespace( clazz ) ) );
-            }
+                addElement( pkgDef, "value", pkgName );
+            }            
             String clazzName = facade.getName( clazz );
             Element elemClazz = addElement( classes, "class" );
             addElement( elemClazz, "name", clazzName );
@@ -353,7 +356,8 @@ public class Argo2ModelloMojo
  */
                 	String type = facade.getName( facade.getType( attr ) ).trim();
                     log.info( "Add " + facade.getName( attr ) + " with " + type );                    
-                    if ( !allClasses.containsKey(type) || ModelDefault.isBaseType(type))
+                    //if ( !allClasses.containsKey(type) || ModelDefault.isBaseType(type))
+                    if ( !allClasses.containsKey(type) || ModelloHelper.isBaseType(type))
                     	addElement( elemField, "type", type );
                     else {
                     	Element monoAssoc = addElement(elemField, "association");
@@ -373,21 +377,28 @@ public class Argo2ModelloMojo
     public void addVisibility( Object obj, Element elem )
     {
         Facade facade = Model.getFacade();
-        if ( !facade.isPrivate( obj ) )
+        if ( !facade.isPrivate( obj ) || facade.isStatic( obj ) )
         {
+            Element modifier = addElement( elem, "modifier");
             if ( facade.isProtected( obj ) )
             {
-                addElement( elem, "modifier", "protected" );
+               modifier.addContent("protected" );
             }
             else if ( facade.isPublic( obj ) )
             {
-                addElement( elem, "modifier", "public" );
+            	modifier.addContent("public" );
             }
             else if ( facade.isPackage( obj ) )
             {
-                addElement( elem, "modifier", "package" );
+            	modifier.addContent("package" );
             }
-        }
+            if ( facade.isStatic( obj ) )
+            {
+            	if ( !"".equals( modifier.getText() ) )
+            		modifier.addContent(",");
+            	modifier.addContent("static");
+            }
+        }        
         // by default objects are private (but they are public in ArgoUML - take care to fields)
     }
 
@@ -421,25 +432,38 @@ public class Argo2ModelloMojo
             for ( Object behavioralFeature : bFeatures )
             {
             	String name = facade.getName( behavioralFeature );
-            	boolean getterOrSetter = false;
+            	boolean getter = false;
+            	boolean setter = false;
             	if (name.startsWith("get")) {
             		name = name.substring("get".length());
-            		getterOrSetter = true;
+            		getter = true;
             	}
             	else if (name.startsWith("set"))
             	{
             		name = name.substring("set".length());
-            		getterOrSetter = true;
+            		setter = true;
             	}
             	else if (name.startsWith("is"))
             	{
             		name = name.substring("is".length());
-            		getterOrSetter = true;
+            		getter = true;
             	}
-            	if (getterOrSetter) {
+            	if (getter || setter) {
             		Set<String> fields = fieldsForClasses.get(getFullName(cls));
-            		if (fields != null && fields.contains(name.toUpperCase()))
-            			continue;
+            		if (fields != null && fields.contains(name.toUpperCase())) {
+            			List<Element> fieldsList = elemClazz.getChild("fields").getChildren();
+            			for (Element e : fieldsList)
+            			{
+            				if (name.toUpperCase().equals(e.getChild("name").getText().toUpperCase()))
+            				{
+            					if (setter)
+            						e.setAttribute("java.setter", "false");
+            					else
+            						e.setAttribute("java.getter", "false");
+            				}
+            			}
+            		}
+//            			continue;
             	}            		
             	StringBuffer sb = new StringBuffer();
                 sb.append( GeneratorJava2.INDENT );
