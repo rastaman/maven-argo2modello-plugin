@@ -54,7 +54,7 @@ import org.jdom.output.XMLOutputter;
 import org.jdom.output.Format.TextMode;
 
 /**
- * @goal generate-modello
+ * @goal generate
  * @phase process-sources
  */
 public class Argo2ModelloMojo
@@ -343,6 +343,11 @@ public class Argo2ModelloMojo
                 Element elemField = addElement( fields, "field" );
                 addElement( elemField, "name", facade.getName( attr ) );
                 
+                if ("heureRdv".equals( facade.getName( attr ) ) )
+                {
+                    Object type = facade.getType( attr );
+                    System.err.println( type );
+                }
                 if (fieldsForClasses.get(clazzName) == null)
                 	fieldsForClasses.put(clazzName, new HashSet<String>());
                 fieldsForClasses.get(clazzName).add(facade.getName( attr ).toUpperCase());
@@ -365,7 +370,7 @@ public class Argo2ModelloMojo
                     	addElement(monoAssoc, "multiplicity", "1");
                     }
                 } else {
-                    log.info( "Cannot add attr " + facade.getName( attr ) + " with no type for " + attr );                	
+                    log.info( "Cannot add type of attr " + facade.getName( attr ) + " with no type for " + attr );
                 }
                 // if not default case
                 addVisibility( attr, elemField );
@@ -518,12 +523,12 @@ public class Argo2ModelloMojo
             {
                 Object association = facade.getAssociation( associationEnd );
                 Object otherAssociationEnd = facade.getNextEnd( associationEnd );
-                if ( !facade.isNavigable( otherAssociationEnd ) )
-                    continue;
                 String otherEndName = facade.getName(associationEnd);
                 String otherTypeName = facade.getName(facade.getType(associationEnd));
                 String endName = facade.getName( otherAssociationEnd );
                 String typeName = facade.getName( facade.getType( otherAssociationEnd ) );
+                if ( !facade.isNavigable( otherAssociationEnd ) )
+                    continue;
                 if ( "".equals( endName ) || endName == null )
                 {
                     endName = typeName;

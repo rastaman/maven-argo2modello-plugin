@@ -50,7 +50,10 @@ public class ConvertProjectTest
     protected void initModelFiles()
     {
         sourceModel = new File( "src/test/resources/uml/" + testModel + ".uml" );
-        destinationModel = new File( "target/" + testModel + ".mdo" );    	
+        if ( !sourceModel.exists() )
+            sourceModel = new File( testModel );
+        if ( this.destinationModel == null)
+            destinationModel = new File( "target/" + testModel + ".mdo" );    	
     }
     
     public void testConvert()

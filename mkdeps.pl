@@ -1,8 +1,9 @@
 #!/usr/bin/perl
 use strict;
 
-my $argoFolder = $ARGV[0] || "/Volumes/CodeSource/Workspaces/Catanotes/argouml";
-my $argoVersion = $ARGV[1] || "0.28";  
+#my $argoFolder = $ARGV[0] || "/Volumes/CodeSource/Workspaces/Catanotes/argouml";
+my $argoFolder =$ARGV[0] || "/Applications/ArgoUML_302.app/Contents/Resources/Java";
+my $argoVersion = $ARGV[1] || "0.30.2";  
  
 my %namesToGroups = (
   'argouml-mdr' => 'org.tigris.argouml',
@@ -33,7 +34,8 @@ main();
 sub main
 {
    my $i = 0;
-   my @lines = `find $argoFolder/src/argouml-build/build -name *.jar`;
+#   my @lines = `find $argoFolder/src/argouml-build/build -name *.jar`;
+   my @lines = `find $argoFolder -name *.jar`;
    my $installScript = "#!/bin/sh\n";
    my $mavenDeps = "";
    foreach my $line (@lines) {
