@@ -531,7 +531,7 @@ public class Argo2ModelloMojo
                     continue;
                 if ( "".equals( endName ) || endName == null )
                 {
-                    endName = typeName;
+                    endName = StringUtils.uncapitalize( typeName );
                 }
                 String multiplicity = facade.getName( facade.getMultiplicity( otherAssociationEnd ) );
                 Element elemField = addElement( fields, "field" );
@@ -637,6 +637,7 @@ public class Argo2ModelloMojo
                 String content =
                     "".equals( facade.getValueOfTag( tag ) ) ? name : name + "(" + facade.getValueOfTag( tag ) + ")";
                 addElement( annotations, "annotation", content );
+                //log.info( "Added "+content );
             }
             else
             {
