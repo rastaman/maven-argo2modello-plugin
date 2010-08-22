@@ -548,12 +548,12 @@ public class Argo2ModelloMojo
                     addElement( assoc, "multiplicity", "1" );
                 }
                 // move the annotations to the association
-                if ( elemField.getChild( "annotations" ) != null )
+                /*if ( elemField.getChild( "annotations" ) != null )
                 {
                     Element annotations = (Element) elemField.getChild( "annotations" ).clone();
                     assoc.addContent( annotations );
                     elemField.removeChild( "annotations" );
-                }
+                }*/
             }
         }
         else
