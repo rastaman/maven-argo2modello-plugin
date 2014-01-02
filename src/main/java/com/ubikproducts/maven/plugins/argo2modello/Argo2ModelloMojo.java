@@ -149,9 +149,10 @@ public class Argo2ModelloMojo
         ProfileManagerImpl profileManagerImpl = new org.argouml.profile.internal.ProfileManagerImpl();
         if ( javaProfile != null )
         {
-            String profileDir = javaProfile.getAbsolutePath();
+            String profileDir = javaProfile.isFile() ? javaProfile.getParentFile().getAbsolutePath() : javaProfile.getAbsolutePath();
             profileManagerImpl.addSearchPathDirectory( profileDir );
             profileManagerImpl.refreshRegisteredProfiles();
+            log.info("Loaded Java profile from " + javaProfile.getAbsolutePath() );
         }
         ProfileFacade.setManager( profileManagerImpl );
 
