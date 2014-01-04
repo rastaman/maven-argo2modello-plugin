@@ -1,0 +1,11 @@
+
+# Install dependencies file for ArgoUML
+mvn install -f argouml-bom.xml
+
+# Install composite package for ArgoUML (argouml-all)
+mvn install -f argouml-pom.xml
+
+# Install plugin
+mvn install
+
+# Configure in your POM

@@ -18,18 +18,6 @@
 	<name>ArgoUML to Modello Maven plugin</name>
 	<version>1.0.3</version>
 	<url>http://maven-argo2modello-plugin.tigris.org</url>
-	<!-- BOMs files -->
-	<dependencyManagement>
-		<dependencies>
-			<dependency>
-				<groupId>com.ubikproducts.maven</groupId>
-				<artifactId>argouml-bom</artifactId>
-				<version>${argouml.version}</version>
-				<type>pom</type>
-				<scope>import</scope>
-			</dependency>
-		</dependencies>
-	</dependencyManagement>
 	<build>
 		<plugins>
 			<plugin>
@@ -56,126 +44,10 @@
 	<dependencies>
 		<dependency>
 			<groupId>org.argouml</groupId>
-			<artifactId>argouml</artifactId>
+			<artifactId>argouml-all</artifactId>
+			<version>${argouml.version}</version>
+			<type>pom</type>
 		</dependency>
-
-		<dependency>
-			<groupId>org.argouml</groupId>
-			<artifactId>argouml-model</artifactId>
-		</dependency>
-
-		<dependency>
-			<groupId>org.tigris.gef</groupId>
-			<artifactId>gef</artifactId>
-		</dependency>
-
-		<dependency>
-			<groupId>commons-logging</groupId>
-			<artifactId>commons-logging</artifactId>
-		</dependency>
-
-		<dependency>
-			<groupId>org.apache.batik</groupId>
-			<artifactId>batik-dom</artifactId>
-		</dependency>
-
-		<dependency>
-			<groupId>org.apache.batik</groupId>
-			<artifactId>batik-ext</artifactId>
-		</dependency>
-
-		<dependency>
-			<groupId>org.apache.batik</groupId>
-			<artifactId>batik-svggen</artifactId>
-		</dependency>
-
-		<dependency>
-			<groupId>org.apache.batik</groupId>
-			<artifactId>batik-awt-util</artifactId>
-		</dependency>
-
-		<dependency>
-			<groupId>org.tigris.swidgets</groupId>
-			<artifactId>swidgets</artifactId>
-		</dependency>
-		<dependency>
-			<groupId>org.tigris.toolbar</groupId>
-			<artifactId>toolbar</artifactId>
-		</dependency>
-		<dependency>
-			<groupId>tudresden.ocl</groupId>
-			<artifactId>ocl-argo</artifactId>
-		</dependency>
-		<dependency>
-			<groupId>org.argouml</groupId>
-			<artifactId>argouml-mdr</artifactId>
-		</dependency>
-		<dependency>
-			<groupId>org.argouml</groupId>
-			<artifactId>java-interfaces</artifactId>
-		</dependency>
-		<dependency>
-			<groupId>jmi</groupId>
-			<artifactId>jmi</artifactId>
-		</dependency>
-		<dependency>
-			<groupId>jmi</groupId>
-			<artifactId>mof</artifactId>
-		</dependency>
-		<dependency>
-			<groupId>org.netbeans.mdr</groupId>
-			<artifactId>jmiutils</artifactId>
-		</dependency>
-		<dependency>
-			<groupId>org.netbeans.mdr</groupId>
-			<artifactId>mdrapi</artifactId>
-		</dependency>
-		<dependency>
-			<groupId>org.netbeans.mdr</groupId>
-			<artifactId>openide-util</artifactId>
-		</dependency>
-		<dependency>
-			<groupId>org.netbeans.mdr</groupId>
-			<artifactId>nbmdr</artifactId>
-		</dependency>
-		<dependency>
-			<groupId>net.sourceforge.saxon</groupId>
-			<artifactId>saxon</artifactId>
-		</dependency>
-		<dependency>
-			<groupId>easymock</groupId>
-			<artifactId>easymock</artifactId>
-		</dependency>
-		<dependency>
-			<groupId>jdepend</groupId>
-			<artifactId>jdepend</artifactId>
-		</dependency>
-
-		<!-- Argo <dependency> <groupId>antlr</groupId> <artifactId>antlr</artifactId> 
-			<version>2.7.7</version> </dependency> <dependency> <groupId>org.tigris.argouml</groupId> 
-			<artifactId>argouml-mdr</artifactId> <version>${argouml.version}</version> 
-			</dependency> <dependency> <groupId>org.tigris.argouml</groupId> <artifactId>argouml-model</artifactId> 
-			<version>${argouml.version}</version> </dependency> <dependency> <groupId>org.tigris.argouml</groupId> 
-			<artifactId>argouml</artifactId> <version>${argouml.version}</version> </dependency> 
-			<dependency> <groupId>argo_java</groupId> <artifactId>argo_java</artifactId> 
-			<version>${argouml.version}</version> </dependency> <dependency> <groupId>org.tigris.argouml</groupId> 
-			<artifactId>argouml-diagrams-sequence</artifactId> <version>${argouml.version}</version> 
-			</dependency> <dependency> <groupId>org.tigris.gef</groupId> <artifactId>gef</artifactId> 
-			<version>0.13.1</version> </dependency> <dependency> <groupId>org.omg.uml</groupId> 
-			<artifactId>java-interfaces</artifactId> <version>1.0</version> </dependency> 
-			<dependency> <groupId>javax.jmi</groupId> <artifactId>jmi</artifactId> <version>1.0</version> 
-			</dependency> <dependency> <groupId>javax.jmi</groupId> <artifactId>jmiutils</artifactId> 
-			<version>1.0</version> </dependency> <dependency> <groupId>org.netbeans.mdr</groupId> 
-			<artifactId>mdrapi</artifactId> <version>1.0</version> </dependency> <dependency> 
-			<groupId>org.omg.mof</groupId> <artifactId>mof</artifactId> <version>1.0</version> 
-			</dependency> <dependency> <groupId>org.netbeans.mdr</groupId> <artifactId>nbmdr</artifactId> 
-			<version>1.0</version> </dependency> <dependency> <groupId>org.tigris.argouml</groupId> 
-			<artifactId>ocl-argo</artifactId> <version>1.1</version> </dependency> <dependency> 
-			<groupId>org.netbeans.openide</groupId> <artifactId>openide-util</artifactId> 
-			<version>1.0</version> </dependency> <dependency> <groupId>org.tigris</groupId> 
-			<artifactId>swidgets</artifactId> <version>0.1.4</version> </dependency> 
-			<dependency> <groupId>org.tigris</groupId> <artifactId>toolbar</artifactId> 
-			<version>1.4.1-20071227</version> </dependency> -->
 		<!-- Modello -->
 		<dependency>
 			<groupId>org.codehaus.modello</groupId>
