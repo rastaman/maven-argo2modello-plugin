@@ -44,14 +44,13 @@ import org.argouml.profile.ProfileFacade;
 import org.argouml.profile.internal.ProfileManagerImpl;
 import org.argouml.support.ArgoUMLStarter;
 import org.argouml.support.GeneratorJava2;
-import org.codehaus.modello.model.ModelDefault;
 import org.jdom.Document;
 import org.jdom.Element;
 import org.jdom.JDOMException;
 import org.jdom.input.SAXBuilder;
 import org.jdom.output.Format;
-import org.jdom.output.XMLOutputter;
 import org.jdom.output.Format.TextMode;
+import org.jdom.output.XMLOutputter;
 
 /**
  * @goal generate
@@ -63,7 +62,7 @@ public class Argo2ModelloMojo
     /**
      * Location of the file.
      * 
-     * @parameter expression="src/main/mdo/model.mdo"
+     * @parameter alias="destinationModel" property="argo2modello.destinationModel" default-value="src/main/mdo/model.mdo"
      * @required
      */
     private File destinationModel;
@@ -71,15 +70,14 @@ public class Argo2ModelloMojo
     /**
      * Location of the file.
      * 
-     * @parameter expression="src/main/uml/model.uml"
+     * @parameter alias="sourceModel" property="argo2modello.sourceModel" default-value="src/main/uml/model.uml"
      * @required
      */
     private File sourceModel;
 
     /**
      * Location of the Java Profile for ArgoUML, if not shipped in the ArgoUML main JAR.
-     * 
-     * @parameter expression="src/main/profiles/default-java.xmi"
+     * @parameter alias="javaProfile" property="argo2modello.javaProfile" default-value="src/main/profiles/default-java.xmi"
      */
     private File javaProfile;
 
@@ -87,17 +85,24 @@ public class Argo2ModelloMojo
      * Force the generation of the Modello model. Else the modello model is regenerated only when the UML file has
      * changed (last modification time has changed).
      * 
-     * @parameter expression=false
+     * @parameter alias="force" property="argo2modello.force" default-value="false"
      */
     private boolean force;
 
     /**
      * Default imports to set in Modello model. Used for instance to add the packages for annotations.
      * 
-     * @parameter
+     * @parameter alias="defaultImports" property="argo2modello.defaultImports" default-value=""
      */
     private String defaultImports;
 
+    /**
+     * Classes to not generate, separated by commas.
+     * @parameter alias="excludedClasses" property="argo2modello.excludedClasses" default-value=""
+     * @since 1.0.3
+     */
+    private String excludedClasses;
+    
     private List<TaggedValueHandler> taggedValuesHandlers = new ArrayList<TaggedValueHandler>();
     
     // temp caches
@@ -108,6 +113,8 @@ public class Argo2ModelloMojo
     private GeneratorJava2 generator = new GeneratorJava2();
 
     private Map allClasses;
+    
+    private Set<String> excludedClassesSet = new HashSet<String>();
     
     private Logger log = Logger.getLogger( Argo2ModelloMojo.class );
 
@@ -140,6 +147,17 @@ public class Argo2ModelloMojo
             }
         }
 
+        // do some setup
+        if ( excludedClasses != null ) {
+        	String[] excludedClassesArray = excludedClasses.split(",");
+        	for ( String s : excludedClassesArray ) {
+        		excludedClassesSet.add( s );
+        	}
+        	log.info("Excluded classes: "+excludedClasses);
+        } else {
+        	log.info("No excluded classes");
+        }
+        
         if ( !Model.isInitiated() )
         {
             ArgoUMLStarter.initializeMDR();
@@ -198,18 +216,20 @@ public class Argo2ModelloMojo
         while ( it.hasNext() )
         {
             Object inf = it.next();
-            if ( !seenPkg )
-            {
-                seenPkg = true;
-                addElement( pkgDef, "value", facade.getName( facade.getNamespace( inf ) ) );
+            if ( !isExcluded( facade, inf ) ) {
+                if ( !seenPkg )
+                {
+                    seenPkg = true;
+                    addElement( pkgDef, "value", facade.getName( facade.getNamespace( inf ) ) );
+                }
+                Element elemInf = addElement( interfaces, "interface" );
+                String infName = facade.getName( inf );
+                addElement( elemInf, "name", infName );
+                addPackage( inf, elemInf );
+                addTaggedValues( inf, elemInf );
+                addOperations( inf, elemInf );
+                addInheritance( inf, elemInf );            	
             }
-            Element elemInf = addElement( interfaces, "interface" );
-            String infName = facade.getName( inf );
-            addElement( elemInf, "name", infName );
-            addPackage( inf, elemInf );
-            addTaggedValues( inf, elemInf );
-            addOperations( inf, elemInf );
-            addInheritance( inf, elemInf );
         }
         // classes
         //1st pass - collection types names
@@ -219,30 +239,33 @@ public class Argo2ModelloMojo
         {
         	Object clazz = it.next();
         	String name = facade.getName( clazz );
-        	if ( !allClasses.containsKey( name ))
-        	{
-        		allClasses.put( name, clazz );
-        	} else {
-        		if ( allClasses.get( name ) instanceof List )
-        		{
-        			List l = (List) allClasses.get(name);
-        			l.add( clazz );
-        		} else {
-        			Object prevClazz = allClasses.get(name);
-        			List l = new ArrayList();
-        			l.add(prevClazz);
-        			l.add(clazz);
-        			allClasses.put(name, l);
-        		}
+        	if ( !isExcluded( facade, clazz ) ) {
+            	if ( !allClasses.containsKey( name ))
+            	{
+            		allClasses.put( name, clazz );
+            	} else {
+            		if ( allClasses.get( name ) instanceof List )
+            		{
+            			List l = (List) allClasses.get(name);
+            			l.add( clazz );
+            		} else {
+            			Object prevClazz = allClasses.get(name);
+            			List l = new ArrayList();
+            			l.add(prevClazz);
+            			l.add(clazz);
+            			allClasses.put(name, l);
+            		}
+            	}        		
         	}
         }
         Element classes = addElement( rootElement, "classes" );
         it = Model.getCoreHelper().getAllClasses( m ).iterator();
+        Map<String,List<Object>> classesCounter = new HashMap<String,List<Object>>();
         while ( it.hasNext() )
         {
             Object clazz = it.next();
             String pkgName = getPackageName( facade.getNamespace( clazz ) );
-            if (pkgName.startsWith("java."))
+            if (pkgName.startsWith("java.") || isExcluded( facade, clazz))
             	continue;
             if ( !seenPkg )
             {
@@ -250,15 +273,24 @@ public class Argo2ModelloMojo
                 addElement( pkgDef, "value", pkgName );
             }            
             String clazzName = facade.getName( clazz );
-            Element elemClazz = addElement( classes, "class" );
-            addElement( elemClazz, "name", clazzName );
-            addPackage( clazz, elemClazz );
-            addTaggedValues( clazz, elemClazz );
-            addInterfaces( clazz, elemClazz );
-            addInheritance( clazz, elemClazz );
-            addFields( clazz, elemClazz );
-            addAssociations( clazz, elemClazz );
-            addOperations( clazz, elemClazz );
+            
+            // don't do 2 times the same class
+            String fqcn = pkgName + "." + clazzName;
+            if ( classesCounter.containsKey( fqcn ) ) {
+            	classesCounter.get(fqcn).add( clazz );
+            } else {
+            	classesCounter.put(fqcn, new ArrayList<Object>());
+            	classesCounter.get(fqcn).add( clazz );
+            	Element elemClazz = addElement( classes, "class" );
+            	addElement( elemClazz, "name", clazzName );
+            	addPackage( clazz, elemClazz );
+            	addTaggedValues( clazz, elemClazz );
+            	addInterfaces( clazz, elemClazz );
+            	addInheritance( clazz, elemClazz );
+            	addFields( clazz, elemClazz );
+            	addAssociations( clazz, elemClazz );
+            	addOperations( clazz, elemClazz );
+            }
         }
         XMLOutputter outputter = new XMLOutputter();
         Format f = Format.getPrettyFormat();
@@ -277,8 +309,25 @@ public class Argo2ModelloMojo
             throw new MojoExecutionException( "Cannot write model '" + destinationModel.getAbsolutePath() + "': "
                 + e.getMessage(), e );
         }
+        // Output report
+        log.info("-- Argo2Modello generation report --");
+        log.info("Generated " + classesCounter.size() + " classes.");
+        for ( String s : classesCounter.keySet() ) {
+        	log.info( s + ":" + classesCounter.get(s).size() );
+        }
+        log.info("-- End of Argo2Modello generation report --");
     }
 
+    public boolean isExcluded( Facade f, Object o ) {
+    	String fqcn = getFullName( f, o );
+    	boolean excluded = excludedClassesSet.contains( fqcn );
+    	log.info(fqcn + " is"+ (excluded ? " " : " not ")+"excluded" );
+    	return excluded;
+    }
+    
+    public String getFullName( Facade f , Object o ) {
+    	return f.getName( f.getNamespace( o ) ) + "." + f.getName( o );
+    }
     // XML Content generation
 
     public Element addElement( Element e, String n )
@@ -343,12 +392,6 @@ public class Argo2ModelloMojo
                 Object attr = jt.next();
                 Element elemField = addElement( fields, "field" );
                 addElement( elemField, "name", facade.getName( attr ) );
-                
-                if ("heureRdv".equals( facade.getName( attr ) ) )
-                {
-                    Object type = facade.getType( attr );
-                    System.err.println( type );
-                }
                 if (fieldsForClasses.get(clazzName) == null)
                 	fieldsForClasses.put(clazzName, new HashSet<String>());
                 fieldsForClasses.get(clazzName).add(facade.getName( attr ).toUpperCase());
@@ -580,9 +623,11 @@ public class Argo2ModelloMojo
         {
             tag = it.next();
             name = facade.getTag( tag );
+            Object td = facade.getTagDefinition( tag );
+            Object type = facade.getType( tag );
             if ( name == null )
             {
-            	log.info( "No name for tagged value '"+ tag + "' with value '"+ facade.getValue( tag ) + "'" );
+            	log.debug( "No name for tagged value '"+ tag + "' with value '"+ facade.getValue( tag ) + "' and class " + (tag!=null? tag.getClass().getName():"N/A") + " and TD "+td+" and type "+type);
             }
             else if ( "documentation".equals( name ) )
             {
@@ -643,7 +688,7 @@ public class Argo2ModelloMojo
             else
             {
                 try {
-					e.setAttribute( name, facade.getValueOfTag( tag ) );
+					e.setAttribute( name.trim(), facade.getValueOfTag( tag ) );
 				} catch (Exception e1) {
 					log.warn( "Cannot set name to " + name + ": " + e1.getMessage() );
 				}
@@ -790,4 +835,12 @@ public class Argo2ModelloMojo
     {
         this.force = force;
     }
+
+	public String getExcludedClasses() {
+		return excludedClasses;
+	}
+
+	public void setExcludedClasses(String excludedClasses) {
+		this.excludedClasses = excludedClasses;
+	}
 }
