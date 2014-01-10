@@ -114,6 +114,8 @@ public class Argo2ModelloMojo
 
     private Map allClasses;
     
+    private String packageName;
+    
     private Set<String> excludedClassesSet = new HashSet<String>();
     
     private Logger log = Logger.getLogger( Argo2ModelloMojo.class );
@@ -220,7 +222,8 @@ public class Argo2ModelloMojo
                 if ( !seenPkg )
                 {
                     seenPkg = true;
-                    addElement( pkgDef, "value", facade.getName( facade.getNamespace( inf ) ) );
+                    packageName = facade.getName( facade.getNamespace( inf ) );
+                    addElement( pkgDef, "value", packageName );
                 }
                 Element elemInf = addElement( interfaces, "interface" );
                 String infName = facade.getName( inf );
@@ -270,6 +273,7 @@ public class Argo2ModelloMojo
             if ( !seenPkg )
             {
                 seenPkg = true;
+                packageName = pkgName;                
                 addElement( pkgDef, "value", pkgName );
             }            
             String clazzName = facade.getName( clazz );
@@ -321,12 +325,23 @@ public class Argo2ModelloMojo
     public boolean isExcluded( Facade f, Object o ) {
     	String fqcn = getFullName( f, o );
     	boolean excluded = excludedClassesSet.contains( fqcn );
-    	log.info(fqcn + " is"+ (excluded ? " " : " not ")+"excluded" );
+    	if ( !excluded ) {
+    		excluded = excludedClassesSet.contains( packageName + "." + fqcn );
+    	}
+    	log.info(packageName + "." +fqcn + "(" + packageName +") is"+ (excluded ? " " : " not ")+"excluded" );
     	return excluded;
     }
     
     public String getFullName( Facade f , Object o ) {
-    	return f.getName( f.getNamespace( o ) ) + "." + f.getName( o );
+    	String ns = getNamespaceName( f,o );
+    	return ( ns != null ? ns + "." : "" ) + f.getName( o );
+    }
+    
+    public String getNamespaceName( Facade f, Object o) {
+    	String ns = null;
+    	if ( f.getNamespace( o ) != null )
+    		ns = getNamespaceName(f, f.getNamespace( o ) );
+    	return ns;
     }
     // XML Content generation
 
@@ -573,6 +588,7 @@ public class Argo2ModelloMojo
                 String typeName = facade.getName( facade.getType( otherAssociationEnd ) );
                 if ( !facade.isNavigable( otherAssociationEnd ) )
                     continue;
+                //TODO: Check strange code
                 if ( "".equals( endName ) || endName == null )
                 {
                     endName = StringUtils.uncapitalize( typeName );
