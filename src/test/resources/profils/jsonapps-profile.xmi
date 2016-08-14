@@ -1,0 +1,346 @@
+<?xml version = '1.0' encoding = 'UTF-8' ?>
+<XMI xmi.version = '1.2' xmlns:UML = 'org.omg.xmi.namespace.UML' timestamp = 'Sun Jul 26 09:09:57 CEST 2009'>
+  <XMI.header>    <XMI.documentation>
+      <XMI.exporter>ArgoUML (using Netbeans XMI Writer version 1.0)</XMI.exporter>
+      <XMI.exporterVersion>0.28(6) revised on $Date: 2007-05-12 08:08:08 +0200 (Sat, 12 May 2007) $ </XMI.exporterVersion>
+    </XMI.documentation>
+    <XMI.metamodel xmi.name="UML" xmi.version="1.4"/></XMI.header>
+  <XMI.content>
+    <UML:Model xmi.id = '-64--88-0-6-1b7927a1:1226a31c595:-8000:0000000000000B36'
+      name = 'JSONApps' isSpecification = 'false' isRoot = 'false' isLeaf = 'false'
+      isAbstract = 'false'>
+      <UML:ModelElement.stereotype>
+        <UML:Stereotype href = 'http://argouml.org/profiles/uml14/default-uml14.xmi#.:0000000000000877'/>
+      </UML:ModelElement.stereotype>
+      <UML:ModelElement.taggedValue>
+        <UML:TaggedValue xmi.id = '-64--88-1-3--3c483fe3:119aa9cff00:-8000:00000000000007A4'
+          isSpecification = 'false'>
+          <UML:TaggedValue.dataValue>This profile contains definitions for Java Annotations, classes and datatypes which are not contained in the Java profile.  It includes support for JPA, JAXB, JAX-RS.</UML:TaggedValue.dataValue>
+          <UML:TaggedValue.type>
+            <UML:TagDefinition href = 'http://argouml.org/profiles/uml14/default-uml14.xmi#.:000000000000087C'/>
+          </UML:TaggedValue.type>
+        </UML:TaggedValue>
+      </UML:ModelElement.taggedValue>
+      <UML:Namespace.ownedElement>
+        <UML:TagDefinition xmi.id = '-64--88-0-6-1b7927a1:1226a31c595:-8000:0000000000000CE9'
+          name = '@XmlRootElement' isSpecification = 'false'>
+          <UML:TagDefinition.multiplicity>
+            <UML:Multiplicity xmi.id = '-64--88-0-6-1b7927a1:1226a31c595:-8000:0000000000000CEA'>
+              <UML:Multiplicity.range>
+                <UML:MultiplicityRange xmi.id = '-64--88-0-6-1b7927a1:1226a31c595:-8000:0000000000000CEB'
+                  lower = '0' upper = '1'/>
+              </UML:Multiplicity.range>
+            </UML:Multiplicity>
+          </UML:TagDefinition.multiplicity>
+        </UML:TagDefinition>
+        <UML:TagDefinition xmi.id = '-64--88-0-6-1b7927a1:1226a31c595:-8000:0000000000000CEE'
+          name = '@Entity' isSpecification = 'false'>
+          <UML:TagDefinition.multiplicity>
+            <UML:Multiplicity xmi.id = '-64--88-0-6-1b7927a1:1226a31c595:-8000:0000000000000CEF'>
+              <UML:Multiplicity.range>
+                <UML:MultiplicityRange xmi.id = '-64--88-0-6-1b7927a1:1226a31c595:-8000:0000000000000CF0'
+                  lower = '0' upper = '1'/>
+              </UML:Multiplicity.range>
+            </UML:Multiplicity>
+          </UML:TagDefinition.multiplicity>
+        </UML:TagDefinition>
+        <UML:TagDefinition xmi.id = '-64--88-0-6-1b7927a1:1226a31c595:-8000:0000000000000CF1'
+          name = '@Table' isSpecification = 'false'>
+          <UML:TagDefinition.multiplicity>
+            <UML:Multiplicity xmi.id = '-64--88-0-6-1b7927a1:1226a31c595:-8000:0000000000000CF2'>
+              <UML:Multiplicity.range>
+                <UML:MultiplicityRange xmi.id = '-64--88-0-6-1b7927a1:1226a31c595:-8000:0000000000000CF3'
+                  lower = '0' upper = '1'/>
+              </UML:Multiplicity.range>
+            </UML:Multiplicity>
+          </UML:TagDefinition.multiplicity>
+        </UML:TagDefinition>
+        <UML:TagDefinition xmi.id = '-64--88-0-6-1b7927a1:1226a31c595:-8000:0000000000000CF6'
+          name = '@Id' isSpecification = 'false'>
+          <UML:TagDefinition.multiplicity>
+            <UML:Multiplicity xmi.id = '-64--88-0-6-1b7927a1:1226a31c595:-8000:0000000000000CF7'>
+              <UML:Multiplicity.range>
+                <UML:MultiplicityRange xmi.id = '-64--88-0-6-1b7927a1:1226a31c595:-8000:0000000000000CF8'
+                  lower = '0' upper = '1'/>
+              </UML:Multiplicity.range>
+            </UML:Multiplicity>
+          </UML:TagDefinition.multiplicity>
+        </UML:TagDefinition>
+        <UML:TagDefinition xmi.id = '-64--88-0-6-1b7927a1:1226a31c595:-8000:0000000000000CF9'
+          name = '@SequenceGenerator' isSpecification = 'false'>
+          <UML:TagDefinition.multiplicity>
+            <UML:Multiplicity xmi.id = '-64--88-0-6-1b7927a1:1226a31c595:-8000:0000000000000CFA'>
+              <UML:Multiplicity.range>
+                <UML:MultiplicityRange xmi.id = '-64--88-0-6-1b7927a1:1226a31c595:-8000:0000000000000CFB'
+                  lower = '0' upper = '1'/>
+              </UML:Multiplicity.range>
+            </UML:Multiplicity>
+          </UML:TagDefinition.multiplicity>
+        </UML:TagDefinition>
+        <UML:TagDefinition xmi.id = '-64--88-0-6-1b7927a1:1226a31c595:-8000:0000000000000CFC'
+          name = '@GeneratedValue' isSpecification = 'false'>
+          <UML:TagDefinition.multiplicity>
+            <UML:Multiplicity xmi.id = '-64--88-0-6-1b7927a1:1226a31c595:-8000:0000000000000CFD'>
+              <UML:Multiplicity.range>
+                <UML:MultiplicityRange xmi.id = '-64--88-0-6-1b7927a1:1226a31c595:-8000:0000000000000CFE'
+                  lower = '0' upper = '1'/>
+              </UML:Multiplicity.range>
+            </UML:Multiplicity>
+          </UML:TagDefinition.multiplicity>
+        </UML:TagDefinition>
+        <UML:TagDefinition xmi.id = '-64--88-0-6-1b7927a1:1226a31c595:-8000:0000000000000CFF'
+          name = '@Column' isSpecification = 'false'>
+          <UML:TagDefinition.multiplicity>
+            <UML:Multiplicity xmi.id = '-64--88-0-6-1b7927a1:1226a31c595:-8000:0000000000000D00'>
+              <UML:Multiplicity.range>
+                <UML:MultiplicityRange xmi.id = '-64--88-0-6-1b7927a1:1226a31c595:-8000:0000000000000D01'
+                  lower = '0' upper = '1'/>
+              </UML:Multiplicity.range>
+            </UML:Multiplicity>
+          </UML:TagDefinition.multiplicity>
+        </UML:TagDefinition>
+        <UML:TagDefinition xmi.id = '-64--88-0-6-1b7927a1:1226a31c595:-8000:0000000000000D41'
+          name = '@ManyToMany' isSpecification = 'false'>
+          <UML:TagDefinition.multiplicity>
+            <UML:Multiplicity xmi.id = '-64--88-0-6-1b7927a1:1226a31c595:-8000:0000000000000D42'>
+              <UML:Multiplicity.range>
+                <UML:MultiplicityRange xmi.id = '-64--88-0-6-1b7927a1:1226a31c595:-8000:0000000000000D43'
+                  lower = '0' upper = '1'/>
+              </UML:Multiplicity.range>
+            </UML:Multiplicity>
+          </UML:TagDefinition.multiplicity>
+        </UML:TagDefinition>
+        <UML:TagDefinition xmi.id = '-64--88-0-6-1b7927a1:1226a31c595:-8000:0000000000000D44'
+          name = '@JoinTable' isSpecification = 'false'>
+          <UML:TagDefinition.multiplicity>
+            <UML:Multiplicity xmi.id = '-64--88-0-6-1b7927a1:1226a31c595:-8000:0000000000000D45'>
+              <UML:Multiplicity.range>
+                <UML:MultiplicityRange xmi.id = '-64--88-0-6-1b7927a1:1226a31c595:-8000:0000000000000D46'
+                  lower = '0' upper = '1'/>
+              </UML:Multiplicity.range>
+            </UML:Multiplicity>
+          </UML:TagDefinition.multiplicity>
+        </UML:TagDefinition>
+        <UML:TagDefinition xmi.id = '-64--88-0-6-443959a9:1226ec16e52:-8000:0000000000000FB1'
+          name = 'jpa.entity' isSpecification = 'false'>
+          <UML:TagDefinition.multiplicity>
+            <UML:Multiplicity xmi.id = '-64--88-0-6-443959a9:1226ec16e52:-8000:0000000000000FB2'>
+              <UML:Multiplicity.range>
+                <UML:MultiplicityRange xmi.id = '-64--88-0-6-443959a9:1226ec16e52:-8000:0000000000000FB3'
+                  lower = '0' upper = '1'/>
+              </UML:Multiplicity.range>
+            </UML:Multiplicity>
+          </UML:TagDefinition.multiplicity>
+        </UML:TagDefinition>
+        <UML:Stereotype xmi.id = '-64--88-0-6--47372ec:122787f4609:-8000:0000000000000FC4'
+          name = 'realize' isSpecification = 'false' isRoot = 'false' isLeaf = 'false'
+          isAbstract = 'false'>
+          <UML:Stereotype.baseClass>Abstraction</UML:Stereotype.baseClass>
+        </UML:Stereotype>
+        <UML:TagDefinition xmi.id = '-64--88-0-6--47372ec:122787f4609:-8000:0000000000001864'
+          name = '@Singleton' isSpecification = 'false'>
+          <UML:TagDefinition.multiplicity>
+            <UML:Multiplicity xmi.id = '-64--88-0-6--47372ec:122787f4609:-8000:0000000000001865'>
+              <UML:Multiplicity.range>
+                <UML:MultiplicityRange xmi.id = '-64--88-0-6--47372ec:122787f4609:-8000:0000000000001866'
+                  lower = '0' upper = '1'/>
+              </UML:Multiplicity.range>
+            </UML:Multiplicity>
+          </UML:TagDefinition.multiplicity>
+        </UML:TagDefinition>
+        <UML:TagDefinition xmi.id = '-64--88-0-6--47372ec:122787f4609:-8000:0000000000001867'
+          name = '@Path' isSpecification = 'false'>
+          <UML:TagDefinition.multiplicity>
+            <UML:Multiplicity xmi.id = '-64--88-0-6--47372ec:122787f4609:-8000:0000000000001868'>
+              <UML:Multiplicity.range>
+                <UML:MultiplicityRange xmi.id = '-64--88-0-6--47372ec:122787f4609:-8000:0000000000001869'
+                  lower = '0' upper = '1'/>
+              </UML:Multiplicity.range>
+            </UML:Multiplicity>
+          </UML:TagDefinition.multiplicity>
+        </UML:TagDefinition>
+        <UML:TagDefinition xmi.id = '-64--88-0-6--47372ec:122787f4609:-8000:000000000000186A'
+          name = '@GET' isSpecification = 'false'>
+          <UML:TagDefinition.multiplicity>
+            <UML:Multiplicity xmi.id = '-64--88-0-6--47372ec:122787f4609:-8000:000000000000186B'>
+              <UML:Multiplicity.range>
+                <UML:MultiplicityRange xmi.id = '-64--88-0-6--47372ec:122787f4609:-8000:000000000000186C'
+                  lower = '0' upper = '1'/>
+              </UML:Multiplicity.range>
+            </UML:Multiplicity>
+          </UML:TagDefinition.multiplicity>
+        </UML:TagDefinition>
+        <UML:TagDefinition xmi.id = '-64--88-0-6--47372ec:122787f4609:-8000:000000000000186D'
+          name = '@Produces' isSpecification = 'false'>
+          <UML:TagDefinition.multiplicity>
+            <UML:Multiplicity xmi.id = '-64--88-0-6--47372ec:122787f4609:-8000:000000000000186E'>
+              <UML:Multiplicity.range>
+                <UML:MultiplicityRange xmi.id = '-64--88-0-6--47372ec:122787f4609:-8000:000000000000186F'
+                  lower = '0' upper = '1'/>
+              </UML:Multiplicity.range>
+            </UML:Multiplicity>
+          </UML:TagDefinition.multiplicity>
+        </UML:TagDefinition>
+        <UML:TagDefinition xmi.id = '-64--88-0-6--47372ec:122787f4609:-8000:0000000000001870'
+          name = '@Consumes' isSpecification = 'false'>
+          <UML:TagDefinition.multiplicity>
+            <UML:Multiplicity xmi.id = '-64--88-0-6--47372ec:122787f4609:-8000:0000000000001871'>
+              <UML:Multiplicity.range>
+                <UML:MultiplicityRange xmi.id = '-64--88-0-6--47372ec:122787f4609:-8000:0000000000001872'
+                  lower = '0' upper = '1'/>
+              </UML:Multiplicity.range>
+            </UML:Multiplicity>
+          </UML:TagDefinition.multiplicity>
+        </UML:TagDefinition>
+        <UML:TagDefinition xmi.id = '-64--88-0-6--47372ec:122787f4609:-8000:0000000000001873'
+          name = '@PUT' isSpecification = 'false'>
+          <UML:TagDefinition.multiplicity>
+            <UML:Multiplicity xmi.id = '-64--88-0-6--47372ec:122787f4609:-8000:0000000000001874'>
+              <UML:Multiplicity.range>
+                <UML:MultiplicityRange xmi.id = '-64--88-0-6--47372ec:122787f4609:-8000:0000000000001875'
+                  lower = '0' upper = '1'/>
+              </UML:Multiplicity.range>
+            </UML:Multiplicity>
+          </UML:TagDefinition.multiplicity>
+        </UML:TagDefinition>
+        <UML:TagDefinition xmi.id = '-64--88-0-6--47372ec:122787f4609:-8000:0000000000001876'
+          name = '@POST' isSpecification = 'false'>
+          <UML:TagDefinition.multiplicity>
+            <UML:Multiplicity xmi.id = '-64--88-0-6--47372ec:122787f4609:-8000:0000000000001877'>
+              <UML:Multiplicity.range>
+                <UML:MultiplicityRange xmi.id = '-64--88-0-6--47372ec:122787f4609:-8000:0000000000001878'
+                  lower = '0' upper = '1'/>
+              </UML:Multiplicity.range>
+            </UML:Multiplicity>
+          </UML:TagDefinition.multiplicity>
+        </UML:TagDefinition>
+        <UML:TagDefinition xmi.id = '-64--88-0-6--47372ec:122787f4609:-8000:0000000000001879'
+          name = '@DELETE' isSpecification = 'false'>
+          <UML:TagDefinition.multiplicity>
+            <UML:Multiplicity xmi.id = '-64--88-0-6--47372ec:122787f4609:-8000:000000000000187A'>
+              <UML:Multiplicity.range>
+                <UML:MultiplicityRange xmi.id = '-64--88-0-6--47372ec:122787f4609:-8000:000000000000187B'
+                  lower = '0' upper = '1'/>
+              </UML:Multiplicity.range>
+            </UML:Multiplicity>
+          </UML:TagDefinition.multiplicity>
+        </UML:TagDefinition>
+        <UML:TagDefinition xmi.id = '-64--88-0-6--47372ec:122787f4609:-8000:000000000000187C'
+          name = '@PathParam' isSpecification = 'false'>
+          <UML:TagDefinition.multiplicity>
+            <UML:Multiplicity xmi.id = '-64--88-0-6--47372ec:122787f4609:-8000:000000000000187D'>
+              <UML:Multiplicity.range>
+                <UML:MultiplicityRange xmi.id = '-64--88-0-6--47372ec:122787f4609:-8000:000000000000187E'
+                  lower = '0' upper = '1'/>
+              </UML:Multiplicity.range>
+            </UML:Multiplicity>
+          </UML:TagDefinition.multiplicity>
+        </UML:TagDefinition>
+        <UML:TagDefinition xmi.id = '-64--88-0-6--47372ec:122787f4609:-8000:0000000000001E56'
+          name = '@QueryParam' isSpecification = 'false'>
+          <UML:TagDefinition.multiplicity>
+            <UML:Multiplicity xmi.id = '-64--88-0-6--47372ec:122787f4609:-8000:0000000000001E57'>
+              <UML:Multiplicity.range>
+                <UML:MultiplicityRange xmi.id = '-64--88-0-6--47372ec:122787f4609:-8000:0000000000001E58'
+                  lower = '0' upper = '1'/>
+              </UML:Multiplicity.range>
+            </UML:Multiplicity>
+          </UML:TagDefinition.multiplicity>
+        </UML:TagDefinition>
+        <UML:TagDefinition xmi.id = '-64--88-0-6--1790bd23:1228a2fe599:-8000:000000000000179C'
+          name = 'jpa.version' isSpecification = 'false'>
+          <UML:TagDefinition.multiplicity>
+            <UML:Multiplicity xmi.id = '-64--88-0-6--1790bd23:1228a2fe599:-8000:000000000000179D'>
+              <UML:Multiplicity.range>
+                <UML:MultiplicityRange xmi.id = '-64--88-0-6--1790bd23:1228a2fe599:-8000:000000000000179E'
+                  lower = '0' upper = '1'/>
+              </UML:Multiplicity.range>
+            </UML:Multiplicity>
+          </UML:TagDefinition.multiplicity>
+        </UML:TagDefinition>
+        <UML:TagDefinition xmi.id = '-64--88-0-6--1790bd23:1228a2fe599:-8000:00000000000017A0'
+          name = 'jaxrs.urls' isSpecification = 'false'>
+          <UML:TagDefinition.multiplicity>
+            <UML:Multiplicity xmi.id = '-64--88-0-6--1790bd23:1228a2fe599:-8000:00000000000017A1'>
+              <UML:Multiplicity.range>
+                <UML:MultiplicityRange xmi.id = '-64--88-0-6--1790bd23:1228a2fe599:-8000:00000000000017A2'
+                  lower = '0' upper = '1'/>
+              </UML:Multiplicity.range>
+            </UML:Multiplicity>
+          </UML:TagDefinition.multiplicity>
+        </UML:TagDefinition>
+        <UML:TagDefinition xmi.id = '-64--88-0-6--1790bd23:1228a2fe599:-8000:00000000000017A3'
+          name = 'jaxrs.version' isSpecification = 'false'>
+          <UML:TagDefinition.multiplicity>
+            <UML:Multiplicity xmi.id = '-64--88-0-6--1790bd23:1228a2fe599:-8000:00000000000017A4'>
+              <UML:Multiplicity.range>
+                <UML:MultiplicityRange xmi.id = '-64--88-0-6--1790bd23:1228a2fe599:-8000:00000000000017A5'
+                  lower = '0' upper = '1'/>
+              </UML:Multiplicity.range>
+            </UML:Multiplicity>
+          </UML:TagDefinition.multiplicity>
+        </UML:TagDefinition>
+        <UML:TagDefinition xmi.id = '-64--88-0-6--1790bd23:1228a2fe599:-8000:00000000000017A9'
+          name = 'jpa.unit' isSpecification = 'false'>
+          <UML:TagDefinition.multiplicity>
+            <UML:Multiplicity xmi.id = '-64--88-0-6--1790bd23:1228a2fe599:-8000:00000000000017AA'>
+              <UML:Multiplicity.range>
+                <UML:MultiplicityRange xmi.id = '-64--88-0-6--1790bd23:1228a2fe599:-8000:00000000000017AB'
+                  lower = '0' upper = '1'/>
+              </UML:Multiplicity.range>
+            </UML:Multiplicity>
+          </UML:TagDefinition.multiplicity>
+        </UML:TagDefinition>
+        <UML:TagDefinition xmi.id = '-64--88-0-6--1790bd23:1228a2fe599:-8000:0000000000002184'
+          name = '@OneToMany' isSpecification = 'false'>
+          <UML:TagDefinition.multiplicity>
+            <UML:Multiplicity xmi.id = '-64--88-0-6--1790bd23:1228a2fe599:-8000:0000000000002185'>
+              <UML:Multiplicity.range>
+                <UML:MultiplicityRange xmi.id = '-64--88-0-6--1790bd23:1228a2fe599:-8000:0000000000002186'
+                  lower = '0' upper = '1'/>
+              </UML:Multiplicity.range>
+            </UML:Multiplicity>
+          </UML:TagDefinition.multiplicity>
+        </UML:TagDefinition>
+        <UML:TagDefinition xmi.id = '-64--88-0-6--1790bd23:1228a2fe599:-8000:0000000000002802'
+          name = '@ManyToOne' isSpecification = 'false'>
+          <UML:TagDefinition.multiplicity>
+            <UML:Multiplicity xmi.id = '-64--88-0-6--1790bd23:1228a2fe599:-8000:0000000000002803'>
+              <UML:Multiplicity.range>
+                <UML:MultiplicityRange xmi.id = '-64--88-0-6--1790bd23:1228a2fe599:-8000:0000000000002804'
+                  lower = '0' upper = '1'/>
+              </UML:Multiplicity.range>
+            </UML:Multiplicity>
+          </UML:TagDefinition.multiplicity>
+        </UML:TagDefinition>
+        <UML:DataType xmi.id = '-64--88-0-6--47372ec:122787f4609:-8000:0000000000001DE8'
+          name = 'Class' isSpecification = 'false' isRoot = 'false' isLeaf = 'false'
+          isAbstract = 'false'/>
+        <UML:DataType xmi.id = '-64--88-0-6--47372ec:122787f4609:-8000:0000000000001DA2'
+          name = 'HashMap&lt;String,Class&gt;' isSpecification = 'false' isRoot = 'false'
+          isLeaf = 'false' isAbstract = 'false'/>
+        <UML:DataType xmi.id = '-64--88-0-6--47372ec:122787f4609:-8000:0000000000001DA1'
+          name = 'java.util.Map&lt;String,Class&gt;' isSpecification = 'false' isRoot = 'false'
+          isLeaf = 'false' isAbstract = 'false'/>
+        <UML:DataType xmi.id = '-64--88-0-6--47372ec:122787f4609:-8000:0000000000001890'
+          name = 'javax.persistence.EntityManager' isSpecification = 'false' isRoot = 'false'
+          isLeaf = 'false' isAbstract = 'false'/>
+        <UML:DataType xmi.id = '-64--88-0-6--47372ec:122787f4609:-8000:0000000000001894'
+          name = 'javax.persistence.EntityManagerFactory' isSpecification = 'false'
+          isRoot = 'false' isLeaf = 'false' isAbstract = 'false'/>
+        <UML:DataType xmi.id = '-64--88-0-6--47372ec:122787f4609:-8000:00000000000018B5'
+          name = 'List&lt;Param&gt;' isSpecification = 'false' isRoot = 'false' isLeaf = 'false'
+          isAbstract = 'false'/>
+        <UML:DataType xmi.id = '-64--88-0-6--47372ec:122787f4609:-8000:00000000000018A8'
+          name = 'List&lt;User&gt;' isSpecification = 'false' isRoot = 'false' isLeaf = 'false'
+          isAbstract = 'false'/>
+        <UML:DataType xmi.id = '-64--88-0-6--47372ec:122787f4609:-8000:0000000000001DCE'
+          name = 'Map&lt;String,String&gt;' isSpecification = 'false' isRoot = 'false'
+          isLeaf = 'false' isAbstract = 'false'/>
+        <UML:DataType xmi.id = '-64--88-0-6--47372ec:122787f4609:-8000:0000000000001916'
+          name = 'org.apache.openjpa.kernel.BrokerFactory' isSpecification = 'false'
+          isRoot = 'false' isLeaf = 'false' isAbstract = 'false'/>
+      </UML:Namespace.ownedElement>
+    </UML:Model>
+  </XMI.content>
+</XMI>
