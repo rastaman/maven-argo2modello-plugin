@@ -13,6 +13,9 @@ public class ModelloGenerator {
     }
 
     public Model generate() {
+        if (nativeModel != null) {
+            
+        }
         return model;
     }
 
@@ -28,7 +31,7 @@ public class ModelloGenerator {
             modelloGenerator.nativeModel = nativeModel;
             return this;
         }
-        
+
         public static ModelloGeneratorBuilder newBuilder() {
             return new ModelloGeneratorBuilder();
         }

@@ -1,12 +1,9 @@
 package com.ubikproducts.maven.plugins.argo2modello;
 
-import java.util.Arrays;
 import java.util.HashSet;
 import java.util.Set;
 
 import org.apache.log4j.Logger;
-
-import com.ubikproducts.maven.plugins.argo2modello.ArgoUMLDriver.ArgoUMLDriverBuilder;
 
 public class ExclusionsRepository {
 
@@ -60,8 +57,5 @@ public class ExclusionsRepository {
         public ExclusionsRepository build() {
             return exclusionsRepository;
         }
-    }
-    public ExclusionsRepository newRepository() {
-        return new ExclusionsRepository();
     }
 }

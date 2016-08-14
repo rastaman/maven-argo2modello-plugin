@@ -269,4 +269,20 @@ public class Argo2ModelloMojo extends AbstractMojo {
     public void setOtherProfilsFolder(String otherProfilsFolders) {
         this.otherProfilsFolders = otherProfilsFolders;
     }
+
+    public String getOtherProfilsFolders() {
+        return otherProfilsFolders;
+    }
+
+    public void setOtherProfilsFolders(String otherProfilsFolders) {
+        this.otherProfilsFolders = otherProfilsFolders;
+    }
+
+    public boolean isLegacyGeneration() {
+        return legacyGeneration;
+    }
+
+    public void setLegacyGeneration(boolean legacyGeneration) {
+        this.legacyGeneration = legacyGeneration;
+    }
 }
