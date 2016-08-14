@@ -36,6 +36,8 @@ public class ConvertProjectTest
 
     private File javaProfile = new File( "src/main/profiles/default-java.xmi" );
 
+    private String otherProfils = null;
+
     private String defaultImports = "javax.persistence.*,javax.xml.bind.annotation.*";
 
     private boolean force = true;
@@ -63,6 +65,7 @@ public class ConvertProjectTest
         plugin.setDestinationModel( destinationModel );
         plugin.setSourceModel( sourceModel );
         plugin.setJavaProfile( javaProfile );
+        plugin.setOtherProfilsFolder(otherProfils);
         plugin.setDefaultImports( defaultImports );
         plugin.setForce(force);
         try
@@ -116,5 +119,29 @@ public class ConvertProjectTest
 	protected void err( String s ) {
 		System.err.println( s );
 	}
+
+    public File getJavaProfile() {
+        return javaProfile;
+    }
+
+    public void setJavaProfile(File javaProfile) {
+        this.javaProfile = javaProfile;
+    }
+
+    public String getOtherProfils() {
+        return otherProfils;
+    }
+
+    public void setOtherProfils(String otherProfils) {
+        this.otherProfils = otherProfils;
+    }
+
+    public boolean isForce() {
+        return force;
+    }
+
+    public void setForce(boolean force) {
+        this.force = force;
+    }
 
 }

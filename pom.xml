@@ -108,6 +108,6 @@
 	</distributionManagement>
 	<properties>
 		<argouml.version>0.35.1-SNAPSHOT</argouml.version>
-		<modello.version>1.8.2-SNAPSHOT</modello.version>
+		<modello.version>1.8.4-SNAPSHOT</modello.version>
 	</properties>
 </project>
