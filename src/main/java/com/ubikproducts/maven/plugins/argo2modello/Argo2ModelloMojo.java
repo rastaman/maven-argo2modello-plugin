@@ -106,7 +106,7 @@ public class Argo2ModelloMojo extends AbstractMojo {
      * generation system which rely on modello classes to generate the model
      * file (mdo).
      */
-    private boolean legacyGeneration = false;
+    private boolean legacyGeneration = true;
 
     //private Logger log = Logger.getLogger(Argo2ModelloMojo.class);
 

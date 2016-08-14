@@ -48,7 +48,7 @@ public class ExclusionsRepository {
         }
 
         public ExclusionsRepositoryBuilder withExclusions(String exclusions) {
-            exclusionsRepository.excludedClassesSet.addAll(Arrays.asList(exclusions.split(",")));
+            exclusionsRepository.registerExclusions(exclusions);
             return this;
         }
 
