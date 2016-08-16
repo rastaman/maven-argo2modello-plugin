@@ -19,6 +19,8 @@ package com.ubikproducts.maven.plugins.argo2modello;
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.util.HashMap;
+import java.util.Map;
 
 import org.apache.maven.plugin.AbstractMojo;
 import org.apache.maven.plugin.MojoExecutionException;
@@ -33,6 +35,7 @@ import com.ubikproducts.maven.plugins.argo2modello.ExclusionsRepository.Exclusio
 import com.ubikproducts.maven.plugins.argo2modello.LegacyModelloGenerator.LegacyModelloGeneratorBuilder;
 import com.ubikproducts.maven.plugins.argo2modello.ModelloDriver.ModelloDriverBuilder;
 import com.ubikproducts.maven.plugins.argo2modello.ModelloGenerator.ModelloGeneratorBuilder;
+import com.ubikproducts.maven.plugins.argo2modello.TypesRepository.TypesRepositoryBuilder;
 
 /**
  * @goal generate
@@ -138,25 +141,32 @@ public class Argo2ModelloMojo extends AbstractMojo {
             return;
         }
 
-        // setup
         ExclusionsRepository exclusionsRepository = ExclusionsRepositoryBuilder.newBuilder()
                 .withExclusions(excludedClasses)
                 .build();
-        //registerExclusions();
 
-        ArgoUMLDriver driver = ArgoUMLDriverBuilder.newBuilder().withProfilesFolders(otherProfilsFolders)
-                .withProfileFolder(javaProfile.getParentFile().getAbsolutePath()).build();
-
+        ArgoUMLDriver driver = ArgoUMLDriverBuilder.newBuilder()
+                .withProfilesFolders(otherProfilsFolders)
+                .withProfileFolder(javaProfile.getParentFile().getAbsolutePath())
+                .build();
         Project p = driver.loadProject(sourceModel);
         Object m = driver.getFirstModel(p);
 
         if (!legacyGeneration) {
-            ModelloGenerator generator = ModelloGeneratorBuilder.newBuilder().withNativeModel(m).build();
+            
+            TypesRepository typesRepository = TypesRepositoryBuilder.newBuilder()
+                    .build();
 
+            ModelloGenerator generator = ModelloGeneratorBuilder
+                    .newBuilder()
+                    .withTypesRepository(typesRepository)
+                    .withArgoUMLDriver(driver)
+                    .withNativeModel(m)
+                    .withModelDefault("defaultImports",defaultImports)
+                    .build();
             org.codehaus.modello.model.Model modelloModel = generator.generate();
 
             ModelloDriver modelloDriver = ModelloDriverBuilder.newBuilder().build();
-
             try {
                 FileWriter writer = new FileWriter(destinationModel);
                 modelloDriver.saveModel(modelloModel, writer);
@@ -260,14 +270,6 @@ public class Argo2ModelloMojo extends AbstractMojo {
 
     public void setExcludedClasses(String excludedClasses) {
         this.excludedClasses = excludedClasses;
-    }
-
-    public String getOtherProfilsFolder() {
-        return otherProfilsFolders;
-    }
-
-    public void setOtherProfilsFolder(String otherProfilsFolders) {
-        this.otherProfilsFolders = otherProfilsFolders;
     }
 
     public String getOtherProfilsFolders() {

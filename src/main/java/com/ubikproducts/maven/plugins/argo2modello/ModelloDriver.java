@@ -10,15 +10,19 @@ import org.codehaus.modello.ModelloException;
 import org.codehaus.modello.core.DefaultModelloCore;
 import org.codehaus.modello.core.MetadataPluginManager;
 import org.codehaus.modello.core.ModelloCore;
+import org.codehaus.modello.core.io.ModelWriter;
 import org.codehaus.modello.model.Model;
 import org.codehaus.modello.model.ModelValidationException;
 
 public class ModelloDriver {
 
     private final ModelloCore modelloCore;
-    
+
+    private final ModelWriter modelWriter;
+
     private ModelloDriver() {
         this.modelloCore = new DefaultModelloCore();
+        this.modelWriter = new ModelWriter();
     }
 
     public static class ModelloDriverBuilder {
@@ -51,7 +55,7 @@ public class ModelloDriver {
     }
 
     public void saveModel(Model model, Writer writer) throws ModelloException {
-        modelloCore.saveModel(model, writer);
+        modelWriter.saveModel(model, writer);
     }
 
     public Model translate(Reader reader, String inputType, Properties parameters)

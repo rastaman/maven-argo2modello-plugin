@@ -7,6 +7,7 @@ import java.util.Set;
 
 import org.apache.maven.plugin.MojoExecutionException;
 import org.argouml.kernel.Project;
+import org.argouml.model.CoreHelper;
 import org.argouml.model.Facade;
 import org.argouml.model.Model;
 import org.argouml.notation.InitNotation;
@@ -92,6 +93,10 @@ public class ArgoUMLDriver {
 
     public Facade getFacade() {
         return Model.getFacade();
+    }
+
+    public CoreHelper getCoreHelper() {
+        return Model.getCoreHelper();
     }
 
     public Object getFirstModel(Project p) {

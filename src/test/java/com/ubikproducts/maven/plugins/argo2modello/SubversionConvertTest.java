@@ -1,12 +1,13 @@
 package com.ubikproducts.maven.plugins.argo2modello;
 
+import org.junit.BeforeClass;
+
 public class SubversionConvertTest extends ConvertProjectTest {
 
-	@Override
-	protected void setUp() throws Exception {
-		super.setUp();
-		this.setTestModel("subversion");
-		this.initModelFiles();
-	}
-	
+    @BeforeClass
+    protected void setUp() throws Exception {
+        this.setTestModel("subversion");
+        this.initModelFiles();
+    }
+
 }

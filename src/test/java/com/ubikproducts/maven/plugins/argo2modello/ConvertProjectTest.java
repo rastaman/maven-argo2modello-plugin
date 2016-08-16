@@ -17,108 +17,96 @@
  */
 package com.ubikproducts.maven.plugins.argo2modello;
 
+import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
+
 import java.io.File;
 
-import junit.framework.TestCase;
-
-import org.apache.log4j.Logger;
 import org.apache.log4j.xml.DOMConfigurator;
 import org.apache.maven.plugin.MojoExecutionException;
+import org.junit.Test;
 
-public class ConvertProjectTest
-    extends TestCase
-{
+public class ConvertProjectTest {
     private String testModel = "users";
 
-    private File sourceModel = new File( "src/test/resources/uml/" + testModel + ".uml" );
+    private File sourceModel = new File("src/test/resources/uml/" + testModel + ".uml");
 
-    private File destinationModel = new File( "target/" + testModel + ".mdo" );
+    private File destinationModel = new File("target/" + testModel + ".mdo");
 
-    private File javaProfile = new File( "src/main/profiles/default-java.xmi" );
-
-    private String otherProfils = null;
+    private File javaProfile = new File("src/main/profiles/default-java.xmi");
 
     private String defaultImports = "javax.persistence.*,javax.xml.bind.annotation.*";
 
+    private String otherProfils = null;
+
     private boolean force = true;
-    
-    /**
-     * The default implementation to start.
-     */
-    private static final String DEFAULT_MODEL_IMPLEMENTATION = "org.argouml.model.mdr.MDRModelImplementation";
 
-    private Logger log = Logger.getLogger( this.getClass() );
-
-    protected void initModelFiles()
-    {
-        sourceModel = new File( "src/test/resources/uml/" + testModel + ".uml" );
-        if ( !sourceModel.exists() )
-            sourceModel = new File( testModel );
-        if ( this.destinationModel == null)
-            destinationModel = new File( "target/" + testModel + ".mdo" );    	
+    protected void initModelFiles() {
+        sourceModel = new File("src/test/resources/uml/" + testModel + ".uml");
+        if (!sourceModel.exists())
+            sourceModel = new File(testModel);
+        if (this.destinationModel == null)
+            destinationModel = new File("target/" + testModel + ".mdo");
     }
-    
-    public void testConvert()
-    {
-        DOMConfigurator.configure( "src/test/resources/log4j.xml" );
+
+    @Test
+    public void testConvert() {
+        DOMConfigurator.configure("src/test/resources/log4j.xml");
         Argo2ModelloMojo plugin = new Argo2ModelloMojo();
-        plugin.setDestinationModel( destinationModel );
-        plugin.setSourceModel( sourceModel );
-        plugin.setJavaProfile( javaProfile );
-        plugin.setOtherProfilsFolder(otherProfils);
-        plugin.setDefaultImports( defaultImports );
+        plugin.setDestinationModel(destinationModel);
+        plugin.setSourceModel(sourceModel);
+        plugin.setJavaProfile(javaProfile);
+        plugin.setOtherProfilsFolders(otherProfils);
+        plugin.setDefaultImports(defaultImports);
         plugin.setForce(force);
-        try
-        {
+        try {
             plugin.execute();
-        }
-        catch ( MojoExecutionException e )
-        {
+        } catch (MojoExecutionException e) {
             e.printStackTrace();
-            fail( e.getMessage() );
+            fail(e.getMessage());
         }
-        assertTrue( destinationModel.exists() );
+        assertTrue(destinationModel.exists());
     }
 
-	public String getTestModel() {
-		return testModel;
-	}
+    public String getTestModel() {
+        return testModel;
+    }
 
-	public void setTestModel(String testModel) {
-		this.testModel = testModel;
-	}
+    public void setTestModel(String testModel) {
+        this.testModel = testModel;
+    }
 
-	public File getSourceModel() {
-		return sourceModel;
-	}
+    public File getSourceModel() {
+        return sourceModel;
+    }
 
-	public void setSourceModel(File sourceModel) {
-		this.sourceModel = sourceModel;
-	}
+    public void setSourceModel(File sourceModel) {
+        this.sourceModel = sourceModel;
+    }
 
-	public File getDestinationModel() {
-		return destinationModel;
-	}
+    public File getDestinationModel() {
+        return destinationModel;
+    }
 
-	public void setDestinationModel(File destinationModel) {
-		this.destinationModel = destinationModel;
-	}
+    public void setDestinationModel(File destinationModel) {
+        this.destinationModel = destinationModel;
+    }
 
-	public String getDefaultImports() {
-		return defaultImports;
-	}
+    public String getDefaultImports() {
+        return defaultImports;
+    }
 
-	public void setDefaultImports(String defaultImports) {
-		this.defaultImports = defaultImports;
-	}
+    public void setDefaultImports(String defaultImports) {
+        this.defaultImports = defaultImports;
+    }
 
-	protected void out( String s ) {
-		System.out.println( s );
-	}
+    protected void out(String s) {
+        System.out.println(s);
+    }
 
-	protected void err( String s ) {
-		System.err.println( s );
-	}
+    protected void err(String s) {
+        System.err.println(s);
+    }
 
     public File getJavaProfile() {
         return javaProfile;

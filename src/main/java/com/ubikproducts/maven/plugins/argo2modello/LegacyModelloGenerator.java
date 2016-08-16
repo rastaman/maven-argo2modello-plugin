@@ -14,7 +14,6 @@ import java.util.Set;
 
 import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
-import org.apache.maven.plugin.MojoExecutionException;
 import org.argouml.model.Facade;
 import org.argouml.model.Model;
 import org.argouml.support.GeneratorJava2;
@@ -22,33 +21,26 @@ import org.jdom.Document;
 import org.jdom.Element;
 import org.jdom.output.Format;
 import org.jdom.output.Format.TextMode;
+import org.jdom.output.XMLOutputter;
 
 import com.ubikproducts.maven.plugins.argo2modello.ExclusionsRepository.ExclusionsRepositoryBuilder;
 
-import org.jdom.output.XMLOutputter;
-
 public class LegacyModelloGenerator {
-
-    private Map<String, Object> interfacesMap = new HashMap<String, Object>();
-
-    private Map<String, Object> classesMap = new HashMap<String, Object>();
-
-    private GeneratorJava2 generator = new GeneratorJava2();
 
     private Map<String, Set<Object>> allClasses;
 
     private String packageName;
 
-    private String defaultImports;
+    private Logger log = Logger.getLogger(LegacyModelloGenerator.class);
 
-    private List<TaggedValueHandler> taggedValuesHandlers = new ArrayList<TaggedValueHandler>();
+    private GeneratorJava2 generator = new GeneratorJava2();
+
+    private String defaultImports;
 
     private File sourceModel;
 
-    private Logger log = Logger.getLogger(LegacyModelloGenerator.class);
-
     private final Facade facade;
-    
+
     private ExclusionsRepository exclusionsRepository = ExclusionsRepositoryBuilder.newBuilder()
             .build();
 
@@ -201,7 +193,6 @@ public class LegacyModelloGenerator {
     }
 
     public Element addElement(Element e, String n, String s) {
-        Facade facade = Model.getFacade();
         Element child = new Element(n);
         if (s != null)
             child.setText(s);
@@ -504,21 +495,6 @@ public class LegacyModelloGenerator {
             e.addContent(annotations);
         if (!seenVersion)
             addElement(e, "version", "1.0.0");
-    }
-
-    protected boolean isTaggedValueHandled(Object taggedValue) {
-        for (TaggedValueHandler tvh : taggedValuesHandlers) {
-            if (tvh.accept(taggedValue))
-                return true;
-        }
-        return false;
-    }
-
-    protected void handleTaggedValue(Object taggedValue, Element classElement) {
-        for (TaggedValueHandler tvh : taggedValuesHandlers) {
-            if (tvh.accept(taggedValue))
-                tvh.handle(taggedValue, classElement);
-        }
     }
 
     // ArgoUML initialization
