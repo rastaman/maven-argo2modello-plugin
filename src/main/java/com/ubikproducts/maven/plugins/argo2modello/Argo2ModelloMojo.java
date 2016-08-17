@@ -42,6 +42,13 @@ import com.ubikproducts.maven.plugins.argo2modello.TypesRepository.TypesReposito
  * @phase process-sources
  */
 public class Argo2ModelloMojo extends AbstractMojo {
+    
+    public static enum MODE {
+        MODE_LEGACY,
+        MODE_GENERATOR,
+        MODE_READER;
+    }
+
     /**
      * Location of the file.
      * 
@@ -111,6 +118,11 @@ public class Argo2ModelloMojo extends AbstractMojo {
      */
     private boolean legacyGeneration = true;
 
+    /**
+     * Start with the model reader implementation
+     */
+    private boolean readerGeneration = true;
+
     //private Logger log = Logger.getLogger(Argo2ModelloMojo.class);
 
     private boolean validateSettings() throws MojoExecutionException {
@@ -157,14 +169,27 @@ public class Argo2ModelloMojo extends AbstractMojo {
             TypesRepository typesRepository = TypesRepositoryBuilder.newBuilder()
                     .build();
 
-            ModelloGenerator generator = ModelloGeneratorBuilder
-                    .newBuilder()
-                    .withTypesRepository(typesRepository)
-                    .withArgoUMLDriver(driver)
-                    .withNativeModel(m)
-                    .withModelDefault("defaultImports",defaultImports)
-                    .build();
-            org.codehaus.modello.model.Model modelloModel = generator.generate();
+            org.codehaus.modello.model.Model modelloModel = null;
+            if (readerGeneration) {
+                try {
+                    modelloModel = new ModelReader()
+                            .withDriver(driver)
+                            .withTypesRepository(typesRepository)
+                            .withModelDefault("defaultImports",defaultImports)
+                            .loadModel(m);
+                } catch (ModelloException e) {
+                    throw new MojoExecutionException("Cannot read from "+destinationModel.getAbsolutePath()+":"+e.getMessage());
+                }
+            } else {
+                ModelloGenerator generator = ModelloGeneratorBuilder
+                        .newBuilder()
+                        .withTypesRepository(typesRepository)
+                        .withArgoUMLDriver(driver)
+                        .withNativeModel(m)
+                        .withModelDefault("defaultImports",defaultImports)
+                        .build();
+                modelloModel = generator.generate();
+            }
 
             ModelloDriver modelloDriver = ModelloDriverBuilder.newBuilder().build();
             try {
@@ -286,5 +311,13 @@ public class Argo2ModelloMojo extends AbstractMojo {
 
     public void setLegacyGeneration(boolean legacyGeneration) {
         this.legacyGeneration = legacyGeneration;
+    }
+
+    public boolean isReaderGeneration() {
+        return readerGeneration;
+    }
+
+    public void setReaderGeneration(boolean readerGeneration) {
+        this.readerGeneration = readerGeneration;
     }
 }

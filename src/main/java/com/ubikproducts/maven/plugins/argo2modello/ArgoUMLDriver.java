@@ -18,10 +18,13 @@ import org.argouml.persistence.ProjectFilePersister;
 import org.argouml.profile.ProfileFacade;
 import org.argouml.profile.internal.ProfileManagerImpl;
 import org.argouml.support.ArgoUMLStarter;
+import org.argouml.support.GeneratorJava2;
 
 public class ArgoUMLDriver {
 
     private ProfileManagerImpl profileManagerImpl;
+
+    private GeneratorJava2 generator = new GeneratorJava2();
 
     private Set<String> profilsFolders;
 
@@ -89,6 +92,10 @@ public class ArgoUMLDriver {
             throw new MojoExecutionException("Cannot load model '" + file.getAbsolutePath() + "': " + e.getMessage(),
                     e);
         }
+    }
+
+    public GeneratorJava2 getJavaGenerator() {
+        return generator;
     }
 
     public Facade getFacade() {

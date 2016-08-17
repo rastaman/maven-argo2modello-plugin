@@ -13,6 +13,7 @@ import java.util.Set;
 
 import org.apache.commons.lang.StringUtils;
 import org.argouml.model.Facade;
+import org.argouml.model.Model;
 import org.argouml.support.GeneratorJava2;
 import org.codehaus.modello.model.BaseElement;
 import org.codehaus.modello.model.CodeSegment;
@@ -21,7 +22,7 @@ import org.jdom.Element;
 
 public class UmlExtractor {
 
-    private final Facade facade;
+    private final static Facade facade = Model.getFacade();
 
     private final TypesRepository typesRepository;
     
@@ -42,18 +43,15 @@ public class UmlExtractor {
 
     public static String DEFAULT_VERSION = "1.0.0";
 
-    private BaseElement modelElement;
-    
-    public UmlExtractor(BaseElement modelElement, Object umlObject, Facade facade, TypesRepository typesRepository) {
+    public UmlExtractor(Object umlObject, TypesRepository typesRepository) {
         this.taggedValues = new HashMap<String, String>();
         this.attributes = new HashMap<String, String>();
         this.typesRepository = typesRepository;
-        this.facade = facade;
         this.umlObject = umlObject;
         this.annotations = new LinkedHashSet<String>();
     }
 
-    public BaseElement build() {
+    public void build() {
         Iterator<Object> it = facade.getTaggedValues(umlObject);
         while (it.hasNext()) {
             Object tag = it.next().toString();
@@ -61,14 +59,13 @@ public class UmlExtractor {
             // Object td = facade.getTagDefinition(tag);
             // Object type = facade.getType(tag);
             Object value = facade.getValueOfTag(tag).toString().trim();
-            if (!name.startsWith("@")) {
+            if (name.startsWith("@")) {
                 annotations.add(getJavaAnnotation(name, value.toString()));
             } else if (!RESERVED_WORDS.contains(name)) {
                 attributes.put(name, value.toString());
             }
             taggedValues.put(name, value.toString());
         }
-        return modelElement;
     }
 
     public String getName() {
@@ -112,6 +109,10 @@ public class UmlExtractor {
         }
         String version = taggedValues.get("version");
         return VersionExtractor.getNormalizedVersion(StringUtils.strip(version));
+    }
+
+    public String getComment() {
+        return taggedValues.get("comment");
     }
 
     public static class VersionExtractor {
@@ -315,7 +316,7 @@ public class UmlExtractor {
      *            the namespace
      * @return the Java package name
      */
-    private String getPackageName(Object namespace) {
+    public static String getPackageName(Object namespace) {
         if (namespace == null || !facade.isANamespace(namespace) || facade.getNamespace(namespace) == null) {
             return "";
         }
@@ -332,9 +333,9 @@ public class UmlExtractor {
         return packagePath;
     }
 
-    private String getFullName(Object cls) {
-        return getPackageName(facade.getNamespace(cls)) + '.' + facade.getName(cls);
-    }
+//    private String getFullName(Object cls) {
+//        return getPackageName(facade.getNamespace(cls)) + '.' + facade.getName(cls);
+//    }
 
     public String getInheritance() {
         if (!facade.getGeneralizations(umlObject).isEmpty()) {
@@ -352,5 +353,24 @@ public class UmlExtractor {
             }
         }
         return null;
+    }
+    
+
+    public static UmlExtractor of(Object umlObject, TypesRepository typesRepository) {
+        UmlExtractor ue = new UmlExtractor(umlObject, typesRepository);
+        ue.build();
+        return ue;
+    }
+    
+    public static String getFullName(Object o) {
+        String ns = getNamespaceName(o);
+        return (ns != null ? ns + "." : "") + facade.getName(o);
+    }
+
+    public static String getNamespaceName(Object o) {
+        String ns = null;
+        if (facade.getNamespace(o) != null)
+            ns = getNamespaceName(facade.getNamespace(o));
+        return ns;
     }
 }

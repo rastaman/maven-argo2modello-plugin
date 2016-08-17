@@ -18,12 +18,6 @@ import org.codehaus.modello.model.ModelInterface;
 
 public class ModelloGenerator {
 
-    private Logger log = Logger.getLogger(ModelloGenerator.class);
-
-    private ArgoUMLDriver driver;
-
-    private GeneratorJava2 generator = new GeneratorJava2();
-
     private Map<String, String> modelAttributes = new HashMap<String, String>();
 
     private Map<String, Map<String, String>> classAttributes = new HashMap<String, Map<String, String>>();
@@ -35,6 +29,10 @@ public class ModelloGenerator {
     private Map<String, Map<String, String>> associationAttributes = new HashMap<String, Map<String, String>>();
 
     private Map<String, String> modelDefaults = new HashMap<String, String>();
+
+    private Logger log = Logger.getLogger(ModelloGenerator.class);
+
+    private ArgoUMLDriver driver;
 
     private TypesRepository typesRepository;
 
@@ -138,7 +136,7 @@ public class ModelloGenerator {
         if (name != null) {
             element.setName(name);
         }
-        UmlExtractor tve = new UmlExtractor(element, umlObject, facade, typesRepository);
+        UmlExtractor tve = UmlExtractor.of(umlObject,typesRepository);
         tve.build();
         element.setAnnotations(new ArrayList<String>(tve.getAnnotations()));
         element.setDescription(tve.getDescription());
