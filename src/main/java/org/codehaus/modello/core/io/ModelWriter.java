@@ -20,6 +20,7 @@ import org.codehaus.modello.model.ModelInterface;
 import org.codehaus.modello.model.VersionDefinition;
 import org.codehaus.modello.model.VersionRange;
 import org.codehaus.plexus.util.xml.Xpp3Dom;
+import org.codehaus.plexus.util.xml.Xpp3DomBuilder;
 import org.codehaus.plexus.util.xml.Xpp3DomWriter;
 import org.codehaus.plexus.util.xml.pull.MXParser;
 import org.codehaus.plexus.util.xml.pull.XmlPullParser;
@@ -65,6 +66,46 @@ public class ModelWriter {
     }
 
     private Xpp3Dom generateDom(Model model) {
+        Xpp3Dom modelDom = new Xpp3Dom("model");
+//        modelDom.addChild(xpp3Dom);
+        
+        /*
+        while ( eventType != XmlPullParser.END_DOCUMENT )
+        {
+            if ( eventType == XmlPullParser.START_TAG )
+            {
+                if ( parseBaseElement( model, parser ) )
+                {
+                }
+                else if ( "id".equals( parser.getName() ) )
+                {
+                    model.setId( parser.nextText() );
+                }
+                else if ( "defaults".equals( parser.getName() ) )
+                {
+                    parseDefaults( model, parser );
+                }
+                else if ( "versionDefinition".equals( parser.getName() ) )
+                {
+                    parseVersionDefinition( model, parser );
+                }
+                else if ( "interfaces".equals( parser.getName() ) )
+                {
+                    parseInterfaces( model, parser );
+                }
+                else if ( "classes".equals( parser.getName() ) )
+                {
+                    parseClasses( model, parser );
+                }
+                else if ( "model".equals( parser.getName() ) )
+                {
+                    modelAttributes = getAttributes( parser );
+                }
+                else
+                {
+//                    parser.nextText();
+                }
+*/        
         return null;
     }
     

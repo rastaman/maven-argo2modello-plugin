@@ -8,23 +8,18 @@ import org.apache.maven.plugin.MojoExecutionException;
 import org.junit.Before;
 import org.junit.Test;
 
-public class ProAmbuConvertTest {
+public class ModelloConvertTest {
 
     private Argo2ModelloMojo plugin;
 
     @Before
     public void setUp() throws Exception {
-        plugin = Argo2ModelloMojoBuilder.newBuilder().withTestModel("src/test/resources/uml/proambu.uml")
+        plugin = Argo2ModelloMojoBuilder.newBuilder().withTestModel("src/test/resources/models/modello-reverse.uml")
                 .withOtherProfiles("src/test/resources/profils")
                 .withJavaProfil("src/main/profiles/default-java.xmi")
-                .withDefaultImports("javax.persistence.*,javax.xml.bind.annotation.*").build();
-        /*
-         * this.setTestModel("proambu"); File destModel = new
-         * File("target/proambu.mdo"); this.setDestinationModel(destModel);
-         * this.setOtherProfils("src/test/resources/profils");
-         * this.initModelFiles();
-         */
-        // this.setDefaultImports("fr.factory.tif.generic.utils.Biface,fr.factory.tif.generic.utils.BifaceI18n,fr.factory.tif.generic.utils.*,javax.persistence.*,javax.xml.bind.annotation.*,java.util.*,javax.persistence.Query,java.util.Locale,java.util.HashMap,java.util.Vector,java.lang.reflect.Method");
+                .withDefaultImports("javax.persistence.*,javax.xml.bind.annotation.*")
+                .withForcedGeneration()
+                .build();
     }
 
     @Test
@@ -43,6 +38,19 @@ public class ProAmbuConvertTest {
     public void generate_modello() {
         plugin.setLegacyGeneration(false);
         plugin.setDestinationModel(new File("target/proambu-new.mdo"));
+        try {
+            plugin.execute();
+        } catch (MojoExecutionException e) {
+            e.printStackTrace();
+            fail("No error should have happenned");
+        }
+    }
+
+    @Test
+    public void generate_modello_with_model_reader() {
+        plugin.setLegacyGeneration(false);
+        plugin.setReaderGeneration(true);
+        plugin.setDestinationModel(new File("target/proambu-reader.mdo"));
         try {
             plugin.execute();
         } catch (MojoExecutionException e) {
@@ -75,6 +83,11 @@ public class ProAmbuConvertTest {
 
         public Argo2ModelloMojoBuilder withTestModel(String testModel) {
             argo2modelloMojo.setSourceModel(new File(testModel));
+            return this;
+        }
+
+        public Argo2ModelloMojoBuilder withForcedGeneration() {
+            argo2modelloMojo.setForce(true);
             return this;
         }
 

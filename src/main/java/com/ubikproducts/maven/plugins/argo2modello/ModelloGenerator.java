@@ -16,7 +16,7 @@ import org.codehaus.modello.model.ModelDefault;
 import org.codehaus.modello.model.ModelField;
 import org.codehaus.modello.model.ModelInterface;
 
-public class ModelloGenerator {
+public class ModelloGenerator extends AbstractModelloGenerator {
 
     private Map<String, String> modelAttributes = new HashMap<String, String>();
 

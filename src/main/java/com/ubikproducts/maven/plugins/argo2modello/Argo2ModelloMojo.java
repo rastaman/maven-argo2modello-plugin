@@ -121,7 +121,7 @@ public class Argo2ModelloMojo extends AbstractMojo {
     /**
      * Start with the model reader implementation
      */
-    private boolean readerGeneration = true;
+    private boolean readerGeneration = false;
 
     //private Logger log = Logger.getLogger(Argo2ModelloMojo.class);
 

@@ -25,7 +25,7 @@ import org.jdom.output.XMLOutputter;
 
 import com.ubikproducts.maven.plugins.argo2modello.ExclusionsRepository.ExclusionsRepositoryBuilder;
 
-public class LegacyModelloGenerator {
+public class LegacyModelloGenerator extends AbstractModelloGenerator {
 
     private Map<String, Set<Object>> allClasses;
 

@@ -7,7 +7,6 @@ import java.util.HashSet;
 import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.LinkedHashSet;
-import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
@@ -15,17 +14,18 @@ import org.apache.commons.lang.StringUtils;
 import org.argouml.model.Facade;
 import org.argouml.model.Model;
 import org.argouml.support.GeneratorJava2;
-import org.codehaus.modello.model.BaseElement;
 import org.codehaus.modello.model.CodeSegment;
 import org.codehaus.modello.model.ModelField;
 import org.jdom.Element;
 
+import com.google.common.collect.Iterators;
+
 public class UmlExtractor {
 
-    private final static Facade facade = Model.getFacade();
+    private static Facade facade = Model.getFacade();
 
     private final TypesRepository typesRepository;
-    
+
     private final Object umlObject;
 
     private final Map<String, String> taggedValues;
@@ -53,9 +53,12 @@ public class UmlExtractor {
 
     public void build() {
         Iterator<Object> it = facade.getTaggedValues(umlObject);
-        while (it.hasNext()) {
-            Object tag = it.next().toString();
-            String name = facade.getTag(tag).trim();
+        Object[] umlTaggedValues = Iterators.toArray(it, Object.class);
+        for ( Object tag : umlTaggedValues) {
+            String name = facade.getTag(tag);
+            if ( name == null ) {
+                break;
+            }
             // Object td = facade.getTagDefinition(tag);
             // Object type = facade.getType(tag);
             Object value = facade.getValueOfTag(tag).toString().trim();
@@ -89,6 +92,10 @@ public class UmlExtractor {
 
     public Map<String, String> getAttributes() {
         return attributes;
+    }
+
+    public String getTaggedValue(String key) {
+        return taggedValues.get(key);
     }
 
     public String getDescription() {
@@ -143,28 +150,20 @@ public class UmlExtractor {
     public ModelField getModelField(String name, Object attr) {
         ModelField modelField = new ModelField();
         modelField.setName(name);
-/*
-        if (facade.getType(attr) != null) {
-            
-             // <association> <type>ContentTest</type>
-            // <multiplicity>1</multiplicity> </association>
-            String type = facade.getName(facade.getType(attr)).trim();
-            if (!typesRepository.isKnown(type) ) {
-                modelField.setType(type);
-            }
-            else {
-                modelField.
-                modelField.Element monoAssoc = addElement(elemField, "association");
-                addElement(monoAssoc, "type", type);
-                addElement(monoAssoc, "multiplicity", "1");
-            }
-        } else {
-            log.info("Cannot add type of attr " + facade.getName(attr) + " with no type for " + attr);
-        }
-        // if not default case
-        addVisibility(attr, elemField);
-        addTaggedValues(attr, elemField);
-*/
+        /*
+         * if (facade.getType(attr) != null) {
+         * 
+         * // <association> <type>ContentTest</type> //
+         * <multiplicity>1</multiplicity> </association> String type =
+         * facade.getName(facade.getType(attr)).trim(); if
+         * (!typesRepository.isKnown(type) ) { modelField.setType(type); } else
+         * { modelField. modelField.Element monoAssoc = addElement(elemField,
+         * "association"); addElement(monoAssoc, "type", type);
+         * addElement(monoAssoc, "multiplicity", "1"); } } else {
+         * log.info("Cannot add type of attr " + facade.getName(attr) +
+         * " with no type for " + attr); } // if not default case
+         * addVisibility(attr, elemField); addTaggedValues(attr, elemField);
+         */
         return modelField;
     }
 
@@ -174,7 +173,7 @@ public class UmlExtractor {
         while (jt.hasNext()) {
             Object attr = jt.next();
             String name = facade.getName(attr);
-            ModelField modelField = getModelField(name,attr);
+            ModelField modelField = getModelField(name, attr);
             fields.put(name.toUpperCase(), modelField);
         }
         return fields.keySet();
@@ -201,15 +200,15 @@ public class UmlExtractor {
                 }
                 if (getter || setter) {
                     if (fields != null && getFields().contains(name.toUpperCase())) {
-                       /* List<Element> fieldsList = elemClazz.getChild("fields").getChildren();
-                        for (Element e : fieldsList) {
-                            if (name.toUpperCase().equals(e.getChild("name").getText().toUpperCase())) {
-                                if (setter)
-                                    e.setAttribute("java.setter", "false");
-                                else
-                                    e.setAttribute("java.getter", "false");
-                            }
-                        }*/
+                        /*
+                         * List<Element> fieldsList =
+                         * elemClazz.getChild("fields").getChildren(); for
+                         * (Element e : fieldsList) { if
+                         * (name.toUpperCase().equals(e.getChild("name").getText
+                         * ().toUpperCase())) { if (setter)
+                         * e.setAttribute("java.setter", "false"); else
+                         * e.setAttribute("java.getter", "false"); } }
+                         */
                     }
                     // continue;
                 }
@@ -239,9 +238,9 @@ public class UmlExtractor {
                         sb.append(GeneratorJava2.INDENT).append(tv).append(GeneratorJava2.LINE_SEPARATOR);
                     }
                 }
-//                Element operation = addElement(operations, "codeSegment");
-                //addTaggedValues(behavioralFeature, operation);
-                Element methodBody = null;//addElement(operation, "code");
+                // Element operation = addElement(operations, "codeSegment");
+                // addTaggedValues(behavioralFeature, operation);
+                Element methodBody = null;// addElement(operation, "code");
                 methodBody.setText(sb.toString());
             }
         }
@@ -304,7 +303,7 @@ public class UmlExtractor {
          * parser.nextText() ); } else { parser.nextText(); } }
          */
 
-        //modelInterface.addCodeSegment(codeSegment);
+        // modelInterface.addCodeSegment(codeSegment);
         return null;
     }
 
@@ -333,9 +332,10 @@ public class UmlExtractor {
         return packagePath;
     }
 
-//    private String getFullName(Object cls) {
-//        return getPackageName(facade.getNamespace(cls)) + '.' + facade.getName(cls);
-//    }
+    // private String getFullName(Object cls) {
+    // return getPackageName(facade.getNamespace(cls)) + '.' +
+    // facade.getName(cls);
+    // }
 
     public String getInheritance() {
         if (!facade.getGeneralizations(umlObject).isEmpty()) {
@@ -354,14 +354,66 @@ public class UmlExtractor {
         }
         return null;
     }
+
+    public String getAlias() {
+        return getTaggedValue("alias");
+    }
+
+    public String getType() {
+        Object umlType = facade.getType(umlObject);
+        if (umlType == null) {
+            return null;
+        }
+        return facade.getName(umlType).trim();
+    }
+
+    public static String getType(Object umlObject) {
+        Object umlType = facade.getType(umlObject);
+        if (umlType == null) {
+            return null;
+        }
+        return facade.getName(umlType).trim();
+    }
     
+    public String getDefaultValue() {
+        return getTaggedValue("defaultValue");
+    }
+
+    public String getTypeValidator() {
+        return getTaggedValue("typeValidator");
+    }
+
+    public boolean isRequired() {
+        return Boolean.parseBoolean(getTaggedValue("required"));
+    }
+
+    public String getModifiers() {
+        Set<String> modifiers = new LinkedHashSet<String>();
+        if (!facade.isPrivate(umlObject) || facade.isStatic(umlObject)) {
+            if (facade.isProtected(umlObject)) {
+                modifiers.add("protected");
+            } else if (facade.isPublic(umlObject)) {
+                modifiers.add("public");
+            } else if (facade.isPackage(umlObject)) {
+                modifiers.add("package");
+            }
+            if (facade.isStatic(umlObject)) {
+                modifiers.add("static");
+            }
+        }
+        return StringUtils.join(modifiers.toArray(new String[modifiers.size()]), ",");
+    }
 
     public static UmlExtractor of(Object umlObject, TypesRepository typesRepository) {
         UmlExtractor ue = new UmlExtractor(umlObject, typesRepository);
         ue.build();
         return ue;
     }
-    
+
+    public static void setFacade(Facade f) {
+        UmlExtractor.facade = f;
+    }
+
     public static String getFullName(Object o) {
         String ns = getNamespaceName(o);
         return (ns != null ? ns + "." : "") + facade.getName(o);

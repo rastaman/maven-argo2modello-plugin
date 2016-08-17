@@ -4,11 +4,10 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.Iterator;
-import java.util.List;
 import java.util.Map;
 
+import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
 import org.argouml.model.CoreHelper;
 import org.argouml.model.Facade;
@@ -48,13 +47,12 @@ import org.codehaus.modello.model.VersionDefinition;
 import org.codehaus.modello.model.VersionRange;
 import org.codehaus.plexus.util.xml.pull.XmlPullParser;
 import org.codehaus.plexus.util.xml.pull.XmlPullParserException;
-import org.jdom.Element;
 
 /**
  * @author <a href="mailto:trygvis@inamo.no">Trygve Laugst&oslash;l</a>
  * @author <a href="mailto:evenisse@codehaus.org">Emmanuel Venisse</a>
  */
-public class ModelReader {
+public class ModelReader extends AbstractModelloGenerator {
     private Map<String, String> modelAttributes = new HashMap<String, String>();
 
     private Map<String, Map<String, String>> classAttributes = new HashMap<String, Map<String, String>>();
@@ -140,20 +138,9 @@ public class ModelReader {
         if (!modelDefaults.isEmpty()) {
             parseDefaults(model, umlModel);
         }
-        //if ("versionDefinition".equals(parser.getName())) {
-        //    parseVersionDefinition(model, parser);
-        //}
         parseInterfaces(model,umlModel);
-        //else if ( "classes".equals( parser.getName() ) )
-        //{
-        //    parseClasses( model, parser );
-        //}
         parseClasses( model, umlModel );
-        //else if ( "model".equals( parser.getName() ) )
-        //{
         //    modelAttributes = getAttributes( parser );
-        //}
-        
     }
 
     private void parseDefaults(Model model, Object umlModel) throws IOException {
@@ -201,7 +188,7 @@ public class ModelReader {
             }
             Map<String, String> attributes = getAttributes(inf);
             interfaceAttributes.put(modelInterface.getName(), attributes);
-            parseCodeSegment(modelInterface, parser);
+            //TODO: parseCodeSegment(modelInterface, inf);
         }
     }
 
@@ -220,9 +207,9 @@ public class ModelReader {
             }
 
             parseClassInterfaces(modelClass, umlClass);
-            parseFields(modelClass, parser);
-            parseCodeSegment(modelClass, parser);
-
+            parseFields(modelClass, umlClass);
+            //parseCodeSegment(modelClass, umlClass);
+            //TODO: Operations
             model.addClass(modelClass);
             Map<String, String> attributes = getAttributes(umlClass);
             classAttributes.put(modelClass.getName(), attributes);
@@ -242,149 +229,142 @@ public class ModelReader {
         }
     }
 
-    private void parseFields(ModelClass modelClass, Object umlClass) throws XmlPullParserException, IOException {
+    private void parseFields(ModelClass modelClass, Object umlClass) throws IOException {
         String clazzName = UmlExtractor.getFullName(umlClass);
         Collection fieldsUml = facade.getStructuralFeatures(umlClass);
         if (!fieldsUml.isEmpty()) {
             Iterator jt = fieldsUml.iterator();
             while (jt.hasNext()) {
-                Object attr = jt.next();
+                Object umlField = jt.next();
                 ModelField modelField = new ModelField();
                 ModelAssociation modelAssociation = null;
-                Map<String, String> fAttributes = getAttributes(attr);
+                Map<String, String> fAttributes = getAttributes(umlField);
                 Map<String, String> aAttributes = new HashMap<String, String>();
-                parseBaseElement(modelField, attr);
+                parseBaseElement(modelField, umlField);
 
-                
-                if (facade.getType(attr) != null) {
-                    aAttributes = getAttributes(parser);
-                    modelAssociation = parseAssociation(parser);
-                    /*
-                     * <association> <type>ContentTest</type>
-                     * <multiplicity>1</multiplicity> </association>
-                     */
-                    String type = facade.getName(facade.getType(attr)).trim();
-                    log.info("Add " + facade.getName(attr) + " with " + type);
-                }
-                if ("alias".equals(parser.getName())) {
-                    modelField.setAlias(parser.nextText());
-                }
-                if ("type".equals(parser.getName())) {
-                    modelField.setType(parser.nextText());
-                }
-                if ("defaultValue".equals(parser.getName())) {
-                    modelField.setDefaultValue(parser.nextText());
-                }
-                if ("typeValidator".equals(parser.getName())) {
-                    modelField.setTypeValidator(parser.nextText());
-                }
-                if ("required".equals(parser.getName())) {
-                    modelField.setRequired(Boolean.valueOf(parser.nextText()));
-                }
-                if ("identifier".equals(parser.getName())) {
-                    modelField.setIdentifier(Boolean.valueOf(parser.nextText()).booleanValue());
-                }
+                UmlExtractor ue = UmlExtractor.of(umlField, typesRepository);
+                String type = ue.getType();
+                if (type != null) {
+                    aAttributes = getAttributes(umlField);
+                    modelAssociation = parseAssociation(umlField);
+                    log.info("Add " + facade.getName(umlField) + " with " + type);
+                    //modelField.setType(type);
+                    modelField.setAlias(ue.getAlias());
+                    modelField.setDefaultValue(ue.getDefaultValue());
+                    modelField.setTypeValidator(ue.getTypeValidator());
+                    modelField.setRequired(ue.isRequired());
                     // if ( !allClasses.containsKey(type) ||
                     // ModelDefault.isBaseType(type))
-                    if (!allClasses.containsKey(type) || ModelloHelper.isBaseType(type))
-                        addElement(elemField, "type", type);
-                    else {
-                        Element monoAssoc = addElement(elemField, "association");
-                        addElement(monoAssoc, "type", type);
-                        addElement(monoAssoc, "multiplicity", "1");
+                    
+                    if (ModelloHelper.isBaseType(type)) {
+                        // simple field
+                        modelField.setType(type);
+                        //modelField.setModifiers(ue.getModifiers());
+                        modelClass.addField(modelField);
+                    } else if (modelAssociation != null) {
+                        // association (and complex types :-( )
+
+                        //modelAssociation.setModifiers(ue.getModifiers());
+
+                        // Base element
+                        modelAssociation.setName(modelField.getName());
+
+                        modelAssociation.setDescription(modelField.getDescription());
+
+                        modelAssociation.setVersionRange(modelField.getVersionRange());
+
+                        modelAssociation.setComment(modelField.getComment());
+
+                        modelAssociation.setAnnotations(modelField.getAnnotations());
+
+                        // model field fields
+                        modelAssociation.setType(modelField.getType());
+
+                        modelAssociation.setAlias(modelField.getAlias());
+
+                        modelAssociation.setDefaultValue(modelField.getDefaultValue());
+
+                        modelAssociation.setTypeValidator(modelField.getTypeValidator());
+
+                        modelAssociation.setRequired(modelField.isRequired());
+
+                        modelAssociation.setIdentifier(modelField.isIdentifier());
+
+                        if (modelAssociation.getName() != null) {
+                            associationAttributes.put(modelClass.getName() + ":" + modelAssociation.getName() + ":"
+                                    + modelAssociation.getVersionRange(), aAttributes);
+                        }
+                        modelClass.addField(modelAssociation);
+                    } else {
                     }
                 } else {
-                    log.info("Cannot add type of attr " + facade.getName(attr) + " with no type for " + attr);
+                    log.info("Cannot add type of attr " + modelField.getName() + " with no type for " + umlField);
                 }
-                // if not default case
-                addVisibility(attr, elemField);
-                addTaggedValues(attr, elemField);
-            }
-        }
-
-        while (parser.nextTag() == XmlPullParser.START_TAG) {
-            if ("field".equals(parser.getName())) {
-
-                while (parser.nextTag() == XmlPullParser.START_TAG) {
-                    } else if ("association".equals(parser.getName())) {
-                    } else if ("alias".equals(parser.getName())) {
-                        modelField.setAlias(parser.nextText());
-                    } else if ("type".equals(parser.getName())) {
-                        modelField.setType(parser.nextText());
-                    } else if ("defaultValue".equals(parser.getName())) {
-                        modelField.setDefaultValue(parser.nextText());
-                    } else if ("typeValidator".equals(parser.getName())) {
-                        modelField.setTypeValidator(parser.nextText());
-                    } else if ("required".equals(parser.getName())) {
-                        modelField.setRequired(Boolean.valueOf(parser.nextText()));
-                    } else if ("identifier".equals(parser.getName())) {
-                        modelField.setIdentifier(Boolean.valueOf(parser.nextText()).booleanValue());
-                    } else {
-                        parser.nextText();
-                    }
-                }
-
                 if (modelField.getName() != null) {
                     fieldAttributes.put(
                             modelClass.getName() + ":" + modelField.getName() + ":" + modelField.getVersionRange(),
                             fAttributes);
                 }
-
-                if (modelAssociation != null) {
-                    // Base element
-                    modelAssociation.setName(modelField.getName());
-
-                    modelAssociation.setDescription(modelField.getDescription());
-
-                    modelAssociation.setVersionRange(modelField.getVersionRange());
-
-                    modelAssociation.setComment(modelField.getComment());
-
-                    modelAssociation.setAnnotations(modelField.getAnnotations());
-
-                    // model field fields
-                    modelAssociation.setType(modelField.getType());
-
-                    modelAssociation.setAlias(modelField.getAlias());
-
-                    modelAssociation.setDefaultValue(modelField.getDefaultValue());
-
-                    modelAssociation.setTypeValidator(modelField.getTypeValidator());
-
-                    modelAssociation.setRequired(modelField.isRequired());
-
-                    modelAssociation.setIdentifier(modelField.isIdentifier());
-
-                    if (modelAssociation.getName() != null) {
-                        associationAttributes.put(modelClass.getName() + ":" + modelAssociation.getName() + ":"
-                                + modelAssociation.getVersionRange(), aAttributes);
-                    }
-
-                    modelClass.addField(modelAssociation);
-                } else {
-                    modelClass.addField(modelField);
-                }
-            } else {
-                parser.next();
             }
         }
     }
 
-    private ModelAssociation parseAssociation(XmlPullParser parser) throws XmlPullParserException, IOException {
-        ModelAssociation modelAssociation = new ModelAssociation();
-
-        while (parser.nextTag() == XmlPullParser.START_TAG) {
-            if (parseBaseElement(modelAssociation, parser)) {
-            } else if ("type".equals(parser.getName())) {
-                modelAssociation.setTo(parser.nextText());
-            } else if ("multiplicity".equals(parser.getName())) {
-                modelAssociation.setMultiplicity(parser.nextText());
-            } else {
-                parser.nextText();
-            }
+    private ModelAssociation parseAssociation(Object umlObject) throws IOException {
+        String type = UmlExtractor.getType(umlObject);
+        if (!typesRepository.isKnown(type)) {
+            return null;
         }
-
+        ModelAssociation modelAssociation = new ModelAssociation();
+        parseBaseElement(modelAssociation, umlObject);
+        modelAssociation.setTo(type);
+        String multiplicity = null;
+        modelAssociation.setMultiplicity(multiplicity);
         return modelAssociation;
+    }
+
+    private void parseAssociations(ModelClass modelClass, Object umlClass) throws IOException {
+        // add attributes implementing associations
+        Collection ends = facade.getAssociationEnds(umlClass);
+        if (!ends.isEmpty()) {
+            for (Object associationEnd : ends) {
+                Object association = facade.getAssociation(associationEnd);
+                Object otherAssociationEnd = facade.getNextEnd(associationEnd);
+                String otherEndName = facade.getName(associationEnd);
+                String otherTypeName = facade.getName(facade.getType(associationEnd));
+                String endName = facade.getName(otherAssociationEnd);
+                String typeName = facade.getName(facade.getType(otherAssociationEnd));
+                if (!facade.isNavigable(otherAssociationEnd))
+                    continue;
+                // TODO: Check strange code
+                if ("".equals(endName) || endName == null) {
+                    endName = StringUtils.uncapitalize(typeName);
+                }
+                ModelAssociation modelAssociation = new ModelAssociation();
+
+                //addTaggedValues(otherAssociationEnd, elemField);
+                parseBaseElement(modelAssociation, otherAssociationEnd);
+                modelAssociation.setName(endName);
+                modelAssociation.setType(typeName);
+
+                String multiplicity = facade.getName(facade.getMultiplicity(otherAssociationEnd));
+                if (multiplicity.indexOf("*") > -1) {
+                    //addElement(assoc, "multiplicity", "*");
+                    modelAssociation.setMultiplicity("*"/*multiplicity*/);
+                } else {
+                    //addElement(assoc, "multiplicity", "1");
+                    modelAssociation.setMultiplicity("1"/*multiplicity*/);
+                }
+                // move the annotations to the association
+                /*
+                 * if ( elemField.getChild( "annotations" ) != null ) { Element
+                 * annotations = (Element) elemField.getChild( "annotations"
+                 * ).clone(); assoc.addContent( annotations );
+                 * elemField.removeChild( "annotations" ); }
+                 */
+            }
+        } else {
+            log.info("No association ends for '" + facade.getName(umlClass) + "'");
+        }
     }
 
     private void parseCodeSegment(ModelClass modelClass, XmlPullParser parser)
@@ -432,7 +412,7 @@ public class ModelReader {
     }
 
     private boolean parseBaseElement(BaseElement element, Object umlObject)
-            throws XmlPullParserException, IOException {
+            throws IOException {
 
         UmlExtractor ue = UmlExtractor.of(umlObject, typesRepository);
 
@@ -454,9 +434,9 @@ public class ModelReader {
         return true;
     }
 
-    private Map<String, String> getAttributes(XmlPullParser parser) {
+    private Map<String, String> getAttributes(Object umlObject) {
         Map<String, String> attributes = new HashMap<String, String>();
-
+        /*
         for (int i = 0; i < parser.getAttributeCount(); i++) {
             String name = parser.getAttributeName(i);
 
@@ -464,7 +444,7 @@ public class ModelReader {
 
             attributes.put(name, value);
         }
-
+        */
         return attributes;
     }
 }
