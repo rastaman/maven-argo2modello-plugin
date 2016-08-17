@@ -25,19 +25,19 @@ public class ModelloConvertTest {
     @Test
     public void legacy_generate_modello() {
         plugin.setLegacyGeneration(true);
-        plugin.setDestinationModel(new File("target/proambu-legacy.mdo"));
+        plugin.setDestinationModel(new File("target/modello-legacy.mdo"));
         try {
             plugin.execute();
         } catch (MojoExecutionException e) {
             e.printStackTrace();
-            fail("No error should have happenned");
+            fail("No error should have happened");
         }
     }
 
     @Test
     public void generate_modello() {
         plugin.setLegacyGeneration(false);
-        plugin.setDestinationModel(new File("target/proambu-new.mdo"));
+        plugin.setDestinationModel(new File("target/modello-new.mdo"));
         try {
             plugin.execute();
         } catch (MojoExecutionException e) {
@@ -50,7 +50,7 @@ public class ModelloConvertTest {
     public void generate_modello_with_model_reader() {
         plugin.setLegacyGeneration(false);
         plugin.setReaderGeneration(true);
-        plugin.setDestinationModel(new File("target/proambu-reader.mdo"));
+        plugin.setDestinationModel(new File("target/modello-reader.mdo"));
         try {
             plugin.execute();
         } catch (MojoExecutionException e) {
