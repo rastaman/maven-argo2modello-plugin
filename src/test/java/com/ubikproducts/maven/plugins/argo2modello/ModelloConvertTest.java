@@ -31,7 +31,7 @@ public class ModelloConvertTest extends PlexusTestContainer {
                 .build();
     }
 
-    //@Test
+    @Test
     public void legacy_generate_modello() {
         plugin.setLegacyGeneration(true);
         plugin.setDestinationModel(new File("target/modello-legacy.mdo"));
@@ -43,7 +43,7 @@ public class ModelloConvertTest extends PlexusTestContainer {
         }
     }
 
-    //@Test
+    @Test
     public void generate_modello() {
         plugin.setLegacyGeneration(false);
         plugin.setDestinationModel(new File("target/modello-new.mdo"));
