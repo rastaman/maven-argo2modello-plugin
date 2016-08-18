@@ -191,14 +191,22 @@ public class Argo2ModelloMojo extends AbstractMojo {
                 modelloModel = generator.generate();
             }
 
-            ModelloDriver modelloDriver = ModelloDriverBuilder.newBuilder().build();
+            ModelloDriver modelloDriver = ModelloDriverBuilder.newBuilder()
+                    .withParameter("modello.output.directory", "target")
+                    .withParameter("modello.version", "1.0")
+                    .withParameter("modello.package.with.version", "false")
+                    .build();
+            if ( modelloModel.getName() == null) {
+                modelloModel.setName(destinationModel.getName());
+            }
             try {
                 FileWriter writer = new FileWriter(destinationModel);
                 modelloDriver.saveModel(modelloModel, writer);
             } catch (IOException e) {
                 throw new MojoExecutionException("Cannot write to "+destinationModel.getAbsolutePath()+":"+e.getMessage());
             } catch (ModelloException e) {
-                throw new MojoExecutionException("Modello error with "+modelloModel+":"+e.getMessage());
+                e.printStackTrace();
+                throw new MojoExecutionException("Modello error with "+modelloModel+":"+e);
             }
         } else {
             LegacyModelloGenerator generator = LegacyModelloGeneratorBuilder.newBuilder()

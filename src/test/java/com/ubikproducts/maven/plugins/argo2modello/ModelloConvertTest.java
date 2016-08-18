@@ -8,7 +8,16 @@ import org.apache.maven.plugin.MojoExecutionException;
 import org.junit.Before;
 import org.junit.Test;
 
-public class ModelloConvertTest {
+/**
+ * Live up to the "state-of-the-art" ArgoUML reverse engineering
+ * and UML generation with ArgoUML-MDR with this generator of Modello 
+ * models from UML models applied to the Modello {@code org.codehaus.modello.model}
+ * model package (reverse engineering and generation of the uml file has been done
+ * manually with ArgoUML 0.35-1), .
+ * @author lmaitre
+ *
+ */
+public class ModelloConvertTest extends PlexusTestContainer {
 
     private Argo2ModelloMojo plugin;
 
@@ -22,7 +31,7 @@ public class ModelloConvertTest {
                 .build();
     }
 
-    @Test
+    //@Test
     public void legacy_generate_modello() {
         plugin.setLegacyGeneration(true);
         plugin.setDestinationModel(new File("target/modello-legacy.mdo"));
@@ -34,7 +43,7 @@ public class ModelloConvertTest {
         }
     }
 
-    @Test
+    //@Test
     public void generate_modello() {
         plugin.setLegacyGeneration(false);
         plugin.setDestinationModel(new File("target/modello-new.mdo"));

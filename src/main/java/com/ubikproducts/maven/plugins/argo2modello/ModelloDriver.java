@@ -20,9 +20,11 @@ public class ModelloDriver {
 
     private final ModelWriter modelWriter;
 
+    private Properties parameters = new Properties();
+
     private ModelloDriver() {
         this.modelloCore = new DefaultModelloCore();
-        this.modelWriter = new ModelWriter();
+        this.modelWriter = new JDOMModelWriter();
     }
 
     public static class ModelloDriverBuilder {
@@ -35,6 +37,11 @@ public class ModelloDriver {
 
         public static ModelloDriverBuilder newBuilder() {
             return new ModelloDriverBuilder();
+        }
+
+        public ModelloDriverBuilder withParameter(String name, String value) {
+            modelloDriver.parameters.setProperty(name, value);
+            return this;
         }
 
         public ModelloDriver build() {
@@ -54,8 +61,8 @@ public class ModelloDriver {
         return modelloCore.loadModel(reader);
     }
 
-    public void saveModel(Model model, Writer writer) throws ModelloException {
-        modelWriter.saveModel(model, writer);
+    public void saveModel(Model model, Writer writer) throws ModelloException, IOException {
+        modelWriter.saveModel(model, parameters, writer);
     }
 
     public Model translate(Reader reader, String inputType, Properties parameters)

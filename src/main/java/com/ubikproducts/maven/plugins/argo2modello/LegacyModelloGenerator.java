@@ -29,6 +29,8 @@ public class LegacyModelloGenerator extends AbstractModelloGenerator {
 
     private Map<String, Set<Object>> allClasses;
 
+    private Map<String, Set<String>> fieldsForClasses = new HashMap<String, Set<String>>();
+
     private String packageName;
 
     private Logger log = Logger.getLogger(LegacyModelloGenerator.class);
@@ -224,8 +226,6 @@ public class LegacyModelloGenerator extends AbstractModelloGenerator {
             }
         }
     }
-
-    private Map<String, Set<String>> fieldsForClasses = new HashMap<String, Set<String>>();
 
     public void addFields(Object clazz, Element elemClazz) {
         Facade facade = Model.getFacade();
