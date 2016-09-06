@@ -9,15 +9,16 @@ import java.util.LinkedHashMap;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
-import java.util.Optional;
 import java.util.Properties;
 import java.util.Set;
 
+import org.apache.log4j.Logger;
 import org.codehaus.modello.ModelloException;
 import org.codehaus.modello.core.io.ModelWriter;
 import org.codehaus.modello.model.BaseElement;
 import org.codehaus.modello.model.Model;
 import org.codehaus.modello.model.ModelClass;
+import org.codehaus.modello.model.ModelDefault;
 import org.codehaus.modello.model.ModelField;
 import org.codehaus.modello.model.ModelInterface;
 import org.jdom.Document;
@@ -41,6 +42,8 @@ public class JDOMModelWriter implements ModelWriter {
             return name;
         }
     }
+
+    private Logger log = Logger.getLogger(JDOMModelWriter.class);
 
     private Map<String, Set<Object>> allClasses = new LinkedHashMap<String, Set<Object>>();
 
@@ -90,22 +93,19 @@ public class JDOMModelWriter implements ModelWriter {
         // String packageName = model.getDefaultPackageName(false, version);
         addElement(rootElement, "name", model.getName());
         Element defaults = addElement(rootElement, "defaults");
-        if (parameters.containsKey(JDOMModelWriterParameter.DEFAULT_IMPORTS.name())) {
-            String defaultImports = parameters.getProperty(JDOMModelWriterParameter.DEFAULT_IMPORTS.name());
-            if (defaultImports != null && !"".equals(defaultImports)) {
-                Element defaultImportsElement = addElement(defaults, "default");
-                addElement(defaultImportsElement, "key", "defaultImports");
-                addElement(defaultImportsElement, "value", defaultImports);
-            }
-            Element pkgDef = addElement(defaults, "default");
-            addElement(pkgDef, "key", "package");
-            //boolean seenPkg = false;
-            List<ModelInterface> modelInterfaces = model.getAllInterfaces();
-            // interfaces
-            Element interfaces = addElement(rootElement, "interfaces");
-            for (ModelInterface inf : modelInterfaces) {
-                addInterface(inf, interfaces);
-            }
+        for ( ModelDefault md : model.getDefaults() ) {
+            Element modelDefaultElement = addElement(defaults, "default");
+            addElement(modelDefaultElement, "key", md.getKey());
+            addElement(modelDefaultElement, "value", md.getValue());
+        }
+        //Element pkgDef = addElement(defaults, "default");
+        //addElement(pkgDef, "key", "package");
+        //boolean seenPkg = false;
+        List<ModelInterface> modelInterfaces = model.getAllInterfaces();
+        // interfaces
+        Element interfaces = addElement(rootElement, "interfaces");
+        for (ModelInterface inf : modelInterfaces) {
+            addInterface(inf, interfaces);
         }
         // classes
         // 1st pass - collection types names
@@ -213,9 +213,9 @@ public class JDOMModelWriter implements ModelWriter {
     }
 
     public void addInheritance(Object clazz, Element elemClazz) {
-        if (clazz instanceof ModelClass) {
+        if (clazz instanceof ModelClass && ((ModelClass) clazz).getSuperClass() != null) {
             addElement(elemClazz, "superClass", ((ModelClass) clazz).getSuperClass());
-        } else if (clazz instanceof ModelInterface) {
+        } else if (clazz instanceof ModelInterface && ((ModelInterface) clazz).getSuperInterface() != null) {
             addElement(elemClazz, "superInterface", ((ModelInterface) clazz).getSuperInterface());
         }
     }
@@ -268,6 +268,7 @@ public class JDOMModelWriter implements ModelWriter {
 
     public void addFields(ModelClass clazz, Element elemClazz) {
         String clazzName = getFullName(clazz);
+        log.info("Generating fields for " + clazzName);
         List<ModelField> fieldsUml = clazz.getAllFields();
         if (!fieldsUml.isEmpty()) {
             Element fields = addElement(elemClazz, "fields");
@@ -283,10 +284,10 @@ public class JDOMModelWriter implements ModelWriter {
                      * <multiplicity>1</multiplicity> </association>
                      */
                     String type = attr.getType();
-                    // log.info("Add " + attr.getName() + " with " + type);
+                    log.info("Generate field " + attr.getName() + " with type " + type);
                     // if ( !allClasses.containsKey(type) ||
                     // ModelDefault.isBaseType(type))
-                    if (!allClasses.containsKey(type) || ModelloHelper.isBaseType(type))
+                    if (!allClasses.containsKey(type) || ModelloTypesHelper.isBaseType(type))
                         addElement(elemField, "type", type);
                     else {
                         Element monoAssoc = addElement(elemField, "association");
@@ -294,8 +295,7 @@ public class JDOMModelWriter implements ModelWriter {
                         addElement(monoAssoc, "multiplicity", "1");
                     }
                 } else {
-                    // log.info("Cannot add type of attr " + attr.getName() + "
-                    // with no type for " + attr);
+                    log.info("Cannot add type of attr " + attr.getName() + " with no type for " + attr);
                 }
                 // if not default case
                 addVisibility(attr, elemField);

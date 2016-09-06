@@ -19,8 +19,8 @@ package com.ubikproducts.maven.plugins.argo2modello;
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
-import java.util.HashMap;
-import java.util.Map;
+import java.util.ArrayList;
+import java.util.List;
 
 import org.apache.maven.plugin.AbstractMojo;
 import org.apache.maven.plugin.MojoExecutionException;
@@ -126,8 +126,9 @@ public class Argo2ModelloMojo extends AbstractMojo {
     //private Logger log = Logger.getLogger(Argo2ModelloMojo.class);
 
     private boolean validateSettings() throws MojoExecutionException {
-        if (!sourceModel.exists())
+        if (!sourceModel.exists()) {
             throw new MojoExecutionException("Source model '" + sourceModel.getAbsolutePath() + "' doesn't exist!");
+        }
 
         if (destinationModel.exists() && !force) {
             try {
@@ -157,12 +158,15 @@ public class Argo2ModelloMojo extends AbstractMojo {
                 .withExclusions(excludedClasses)
                 .build();
 
-        ArgoUMLDriver driver = ArgoUMLDriverBuilder.newBuilder()
-                .withProfilesFolders(otherProfilsFolders)
-                .withProfileFolder(javaProfile.getParentFile().getAbsolutePath())
+        ArgoUMLDriver argoUmlDriver = ArgoUMLDriverBuilder.newBuilder()
+                .withJavaProfile(javaProfile)
+                .withProfileFolder(otherProfilsFolders)
+                //.withProfileFolder(javaProfile.getParentFile().getAbsolutePath())
+                //.withProfilesFolders(otherProfilsFolders)
+                //.withDefaultProfilesFolder(false)
                 .build();
-        Project p = driver.loadProject(sourceModel);
-        Object m = driver.getFirstModel(p);
+        Project argoUmlProject = argoUmlDriver.loadProject(sourceModel);
+        Object umlModel = argoUmlDriver.getFirstModel(argoUmlProject);
 
         if (!legacyGeneration) {
             
@@ -173,10 +177,11 @@ public class Argo2ModelloMojo extends AbstractMojo {
             if (readerGeneration) {
                 try {
                     modelloModel = new ModelReader()
-                            .withDriver(driver)
+                            .withDriver(argoUmlDriver)
                             .withTypesRepository(typesRepository)
                             .withModelDefault("defaultImports",defaultImports)
-                            .loadModel(m);
+                            .withExclusionsRepository(exclusionsRepository)
+                            .loadModel(umlModel);
                 } catch (ModelloException e) {
                     throw new MojoExecutionException("Cannot read from "+destinationModel.getAbsolutePath()+":"+e.getMessage());
                 }
@@ -184,8 +189,8 @@ public class Argo2ModelloMojo extends AbstractMojo {
                 ModelloGenerator generator = ModelloGeneratorBuilder
                         .newBuilder()
                         .withTypesRepository(typesRepository)
-                        .withArgoUMLDriver(driver)
-                        .withNativeModel(m)
+                        .withArgoUMLDriver(argoUmlDriver)
+                        .withNativeModel(umlModel)
                         .withModelDefault("defaultImports",defaultImports)
                         .build();
                 modelloModel = generator.generate();
@@ -215,7 +220,7 @@ public class Argo2ModelloMojo extends AbstractMojo {
                     .withSourceModel(sourceModel)
                     .build();
             try {
-                generator.generate(m, destinationModel);
+                generator.generate(umlModel, destinationModel);
             } catch (IOException e) {
                 throw new MojoExecutionException("Cannot write to "+destinationModel.getAbsolutePath()+":"+e.getMessage());
             }

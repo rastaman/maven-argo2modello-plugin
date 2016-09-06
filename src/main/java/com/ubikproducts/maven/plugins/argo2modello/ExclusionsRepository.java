@@ -9,6 +9,8 @@ public class ExclusionsRepository {
 
     private final Set<String> excludedClassesSet = new HashSet<String>();
 
+    private final Set<String> includedClassesSet = new HashSet<String>();
+
     private Logger log = Logger.getLogger(ExclusionsRepository.class);
 
     public void registerExclusions(String excludedClasses) {
@@ -24,10 +26,14 @@ public class ExclusionsRepository {
         }
     }
 
+    public boolean isIncluded(String className) {
+        return includedClassesSet.isEmpty() || includedClassesSet.contains(className);
+    }
+
     public boolean isExcluded(String className) {
         return excludedClassesSet.contains(className);
     }
-    
+
     private ExclusionsRepository() {
         
     }
@@ -51,6 +57,11 @@ public class ExclusionsRepository {
 
         public ExclusionsRepositoryBuilder withExclusion(String exclusion) {
             exclusionsRepository.excludedClassesSet.add(exclusion);
+            return this;
+        }
+
+        public ExclusionsRepositoryBuilder withInclusion(String inclusion) {
+            exclusionsRepository.includedClassesSet.add(inclusion);
             return this;
         }
 

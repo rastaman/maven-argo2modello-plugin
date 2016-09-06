@@ -251,7 +251,7 @@ public class LegacyModelloGenerator extends AbstractModelloGenerator {
                     log.info("Add " + facade.getName(attr) + " with " + type);
                     // if ( !allClasses.containsKey(type) ||
                     // ModelDefault.isBaseType(type))
-                    if (!allClasses.containsKey(type) || ModelloHelper.isBaseType(type))
+                    if (!allClasses.containsKey(type) || ModelloTypesHelper.isBaseType(type))
                         addElement(elemField, "type", type);
                     else {
                         Element monoAssoc = addElement(elemField, "association");

@@ -75,6 +75,8 @@ public class ModelReader extends AbstractModelloGenerator {
 
     private TypesRepository typesRepository;
 
+    private ExclusionsRepository exclusionsRepository;
+
     public ModelReader() {
 
     }
@@ -93,6 +95,11 @@ public class ModelReader extends AbstractModelloGenerator {
 
     public ModelReader withModelDefault(String key, String value) {
         this.modelDefaults.put(key, value);
+        return this;
+    }
+
+    public ModelReader withExclusionsRepository(ExclusionsRepository exclusionsRepository) {
+        this.exclusionsRepository = exclusionsRepository;
         return this;
     }
 
@@ -152,6 +159,9 @@ public class ModelReader extends AbstractModelloGenerator {
         }
     }
 
+//    private ModelDefault buildModelDefault(String key, String value) {
+//        
+//    }
     private void parseVersionDefinition(Model model, XmlPullParser parser) throws XmlPullParserException, IOException {
         if ("versionDefinition".equals(parser.getName())) {
             VersionDefinition versionDefinition = new VersionDefinition();
@@ -174,21 +184,23 @@ public class ModelReader extends AbstractModelloGenerator {
         Iterator<Object> it = driver.getCoreHelper().getAllInterfaces(umlModel).iterator();
         while (it.hasNext()) {
             Object inf = it.next();
-            ModelInterface modelInterface = new ModelInterface();
-            model.addInterface(modelInterface);
-
+            ModelInterface modelInterface = new ModelInterface(model, null);
             parseBaseElement(modelInterface, inf);
+            
+            if (!exclusionsRepository.isExcluded(modelInterface.getName())) {
+                model.addInterface(modelInterface);
 
-            UmlExtractor ue = UmlExtractor.of(inf, typesRepository);
-            if ( ue.getPackage()!=null) {
-                modelInterface.setPackageName(ue.getPackage());
+                UmlExtractor ue = UmlExtractor.of(inf, typesRepository);
+                if ( ue.getPackage()!=null) {
+                    modelInterface.setPackageName(ue.getPackage());
+                }
+                if ( ue.getInheritance()!=null) {
+                    modelInterface.setSuperInterface(ue.getInheritance());
+                }
+                Map<String, String> attributes = getAttributes(inf);
+                interfaceAttributes.put(modelInterface.getName(), attributes);
+                //TODO: parseCodeSegment(modelInterface, inf);
             }
-            if ( ue.getInheritance()!=null) {
-                modelInterface.setSuperInterface(ue.getInheritance());
-            }
-            Map<String, String> attributes = getAttributes(inf);
-            interfaceAttributes.put(modelInterface.getName(), attributes);
-            //TODO: parseCodeSegment(modelInterface, inf);
         }
     }
 
@@ -196,23 +208,26 @@ public class ModelReader extends AbstractModelloGenerator {
         Iterator<Object> it = driver.getCoreHelper().getAllClasses(umlModel).iterator();
         while(it.hasNext()) {
             Object umlClass = it.next();
-            ModelClass modelClass = new ModelClass();
+            ModelClass modelClass = new ModelClass(model, null);
             parseBaseElement(modelClass, umlClass);
-            UmlExtractor ue = UmlExtractor.of(umlClass, typesRepository);
-            if ( ue.getPackage()!=null) {
-                modelClass.setPackageName(ue.getPackage());
-            }
-            if ( ue.getInheritance()!=null) {
-                modelClass.setSuperClass(ue.getInheritance());
-            }
+            if (!exclusionsRepository.isExcluded(modelClass.getName())
+                    && exclusionsRepository.isIncluded(modelClass.getName())) {
+                UmlExtractor ue = UmlExtractor.of(umlClass, typesRepository);
+                if ( ue.getPackage()!=null) {
+                    modelClass.setPackageName(ue.getPackage());
+                }
+                if ( ue.getInheritance()!=null) {
+                    modelClass.setSuperClass(ue.getInheritance());
+                }
 
-            parseClassInterfaces(modelClass, umlClass);
-            parseFields(modelClass, umlClass);
-            //parseCodeSegment(modelClass, umlClass);
-            //TODO: Operations
-            model.addClass(modelClass);
-            Map<String, String> attributes = getAttributes(umlClass);
-            classAttributes.put(modelClass.getName(), attributes);
+                parseClassInterfaces(modelClass, umlClass);
+                parseFields(modelClass, umlClass);
+                //parseCodeSegment(modelClass, umlClass);
+                //TODO: Operations
+                model.addClass(modelClass);
+                Map<String, String> attributes = getAttributes(umlClass);
+                classAttributes.put(modelClass.getName(), attributes);
+            }
         }
     }
 
@@ -231,6 +246,7 @@ public class ModelReader extends AbstractModelloGenerator {
 
     private void parseFields(ModelClass modelClass, Object umlClass) throws IOException {
         String clazzName = UmlExtractor.getFullName(umlClass);
+        log.info("Adding fields to " + clazzName);
         Collection fieldsUml = facade.getStructuralFeatures(umlClass);
         if (!fieldsUml.isEmpty()) {
             Iterator jt = fieldsUml.iterator();
@@ -247,7 +263,7 @@ public class ModelReader extends AbstractModelloGenerator {
                 if (type != null) {
                     aAttributes = getAttributes(umlField);
                     modelAssociation = parseAssociation(umlField);
-                    log.info("Add " + facade.getName(umlField) + " with " + type);
+                    log.info("Add field " + facade.getName(umlField) + " with type " + type);
                     //modelField.setType(type);
                     modelField.setAlias(ue.getAlias());
                     modelField.setDefaultValue(ue.getDefaultValue());
@@ -256,7 +272,7 @@ public class ModelReader extends AbstractModelloGenerator {
                     // if ( !allClasses.containsKey(type) ||
                     // ModelDefault.isBaseType(type))
                     
-                    if (ModelloHelper.isBaseType(type)) {
+                    if (ModelloTypesHelper.isBaseType(type)) {
                         // simple field
                         modelField.setType(type);
                         //modelField.setModifiers(ue.getModifiers());

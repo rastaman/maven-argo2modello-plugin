@@ -16,7 +16,7 @@
   <artifactId>argo2modello-maven-plugin</artifactId>
   <packaging>maven-plugin</packaging>
   <name>ArgoUML to Modello Maven plugin</name>
-  <version>1.0.4</version>
+  <version>1.0.5-SNAPSHOT</version>
   <url>http://maven-argo2modello-plugin.tigris.org</url>
   <build>
     <plugins>
@@ -116,7 +116,7 @@
     </snapshotRepository>
   </distributionManagement>
   <properties>
-    <argouml.version>0.35.1-SNAPSHOT</argouml.version>
+    <argouml.version>0.35.2-SNAPSHOT</argouml.version>
     <modello.version>1.8.4-SNAPSHOT</modello.version>
   </properties>
 </project>

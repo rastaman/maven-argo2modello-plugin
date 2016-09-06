@@ -1,8 +1,10 @@
 package com.ubikproducts.maven.plugins.argo2modello;
 
 import java.io.File;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 
 import org.apache.maven.plugin.MojoExecutionException;
@@ -10,33 +12,52 @@ import org.argouml.kernel.Project;
 import org.argouml.model.CoreHelper;
 import org.argouml.model.Facade;
 import org.argouml.model.Model;
+import org.argouml.model.ModelImplementation;
 import org.argouml.notation.InitNotation;
 import org.argouml.notation.providers.java.InitNotationJava;
 import org.argouml.notation.providers.uml.InitNotationUml;
 import org.argouml.persistence.PersistenceManager;
 import org.argouml.persistence.ProjectFilePersister;
+import org.argouml.profile.Profile;
 import org.argouml.profile.ProfileFacade;
 import org.argouml.profile.internal.ProfileManagerImpl;
-import org.argouml.support.ArgoUMLStarter;
 import org.argouml.support.GeneratorJava2;
 
 public class ArgoUMLDriver {
 
     private ProfileManagerImpl profileManagerImpl;
 
-    private GeneratorJava2 generator = new GeneratorJava2();
+    private final GeneratorJava2 generator;
 
     private Set<String> profilsFolders;
 
     private File javaProfile;
 
     private ArgoUMLDriver() {
+        generator = new GeneratorJava2();
+    }
+    /**
+     * The default implementation to start.
+     */
+    private static final String DEFAULT_MODEL_IMPLEMENTATION = "org.argouml.model.mdr.MDRModelImplementation";
 
+    private String modelImplementationClassname = DEFAULT_MODEL_IMPLEMENTATION;
+
+    private void initializeModelImplementation() {
+        initializeModelImplementation(modelImplementationClassname);
     }
 
-    private void initializeMDR() {
-        if (!Model.isInitiated()) {
-            ArgoUMLStarter.initializeMDR();
+    private void initializeModelImplementation(
+            String className) {
+        try {
+            ModelImplementation modelImplementation = (ModelImplementation) Class.forName(className).newInstance();
+            Model.setImplementation(modelImplementation);
+        } catch (ClassNotFoundException e) {
+            throw new RuntimeException(e);
+        } catch (InstantiationException e) {
+            throw new RuntimeException(e);
+        } catch (IllegalAccessException e) {
+            throw new RuntimeException(e);
         }
     }
 
@@ -50,19 +71,29 @@ public class ArgoUMLDriver {
         profileManagerImpl = new org.argouml.profile.internal.ProfileManagerImpl();
     }
 
+    private void clearProfils() {
+        for ( String searchPath : profileManagerImpl.getSearchPathDirectories() ) {
+            profileManagerImpl.removeSearchPathDirectory(searchPath);
+        }
+    }
+
+    /**
+     * Load all the profils registered.
+     * <p>This always force reinitialization of the Profil subsystem
+     * by clearing the search path folders list.
+     */
     private void loadProfils() {
-        // Always force reinitialization of Profile subsystem
+        clearProfils();
         if (javaProfile != null) {
-            // log.info("Loading Java profile from " +
-            // javaProfile.getAbsolutePath());
             loadProfil(javaProfile);
         }
         if (profilsFolders != null) {
-            for (String s : profilsFolders) {
+            profilsFolders.stream().forEachOrdered(s -> {
                 File profilFile = getFileForProfil(s);
                 loadProfil(profilFile);
-            }
+            });
         }
+        profileManagerImpl.refreshRegisteredProfiles();
         ProfileFacade.setManager(profileManagerImpl);
     }
 
@@ -77,7 +108,6 @@ public class ArgoUMLDriver {
     private void loadProfil(File profil) {
         String profileDir = profil.isFile() ? profil.getParentFile().getAbsolutePath() : profil.getAbsolutePath();
         profileManagerImpl.addSearchPathDirectory(profileDir);
-        profileManagerImpl.refreshRegisteredProfiles();
     }
 
     private ProjectFilePersister getPersisterForFile(File file) {
@@ -110,6 +140,18 @@ public class ArgoUMLDriver {
         return p.getUserDefinedModelList().iterator().next();
     }
 
+    public List<String> getProfilesList() {
+        List<String> profilesList = new ArrayList<String>();
+        for (Profile p : profileManagerImpl.getRegisteredProfiles()) {
+            profilesList.add(String.format("%s -> %s", p.getDisplayName(), p.getProfileIdentifier()));
+        }
+        return profilesList;
+    }
+
+    public List<String> getSearchPaths() {
+        return profileManagerImpl.getSearchPathDirectories();
+    }
+
     public static class ArgoUMLDriverBuilder {
 
         private final ArgoUMLDriver argoUMLDriver;
@@ -133,8 +175,18 @@ public class ArgoUMLDriver {
             return this;
         }
 
+        public ArgoUMLDriverBuilder withJavaProfile(File javaProfile) {
+            argoUMLDriver.javaProfile = javaProfile;
+            return this;
+        }
+
+        public ArgoUMLDriverBuilder withModelImplementation(String modelImplementationClassname) {
+            argoUMLDriver.modelImplementationClassname = modelImplementationClassname;
+            return this;
+        }
+
         public ArgoUMLDriver build() {
-            argoUMLDriver.initializeMDR();
+            argoUMLDriver.initializeModelImplementation();
             argoUMLDriver.initializeProfilsManager();
             argoUMLDriver.loadProfils();
             argoUMLDriver.initializeSubsystems();

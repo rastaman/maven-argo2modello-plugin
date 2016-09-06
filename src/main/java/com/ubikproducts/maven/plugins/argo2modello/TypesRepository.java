@@ -25,7 +25,7 @@ public class TypesRepository {
     }
 
     public boolean isKnown(String className) {
-        return ModelloHelper.isBaseType(className) || typesSet.contains(className);
+        return ModelloTypesHelper.isBaseType(className) || typesSet.contains(className);
     }
 
     private TypesRepository() {

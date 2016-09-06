@@ -28,6 +28,9 @@ import org.codehaus.plexus.component.composition.CycleDetectedInComponentGraphEx
 import org.codehaus.plexus.configuration.PlexusConfiguration;
 import org.codehaus.plexus.context.Context;
 import org.codehaus.plexus.context.DefaultContext;
+import org.codehaus.plexus.logging.AbstractLogger;
+import org.codehaus.plexus.logging.Logger;
+import org.codehaus.plexus.logging.console.ConsoleLogger;
 import org.junit.Before;
 import org.sonatype.plexus.build.incremental.BuildContext;
 import org.sonatype.plexus.build.incremental.DefaultBuildContext;
@@ -43,6 +46,8 @@ public class PlexusTestContainer {
     private PlexusContainer container;
 
     private BuildContext buildContext;
+
+    private Logger logger = new ConsoleLogger(AbstractLogger.LEVEL_DEBUG,"PlexusTestContainer");
 
     private static String basedir;
 
@@ -101,7 +106,8 @@ public class PlexusTestContainer {
             throw new RuntimeException("Failed to create plexus container.");
         }
 
-        buildContext = new DefaultBuildContext();
+        buildContext = getBuildContext();
+
         try {
             container.addComponent(buildContext, BuildContext.class.getName());
         } catch (CycleDetectedInComponentGraphException e) {
@@ -198,6 +204,15 @@ public class PlexusTestContainer {
 
     protected void release(Object component) throws Exception {
         getContainer().release(component);
+    }
+
+    protected BuildContext getBuildContext() {
+        if (buildContext == null) {
+            DefaultBuildContext context = new DefaultBuildContext();
+            context.enableLogging(logger);
+            buildContext = context;
+        }
+        return buildContext;
     }
 
     // ----------------------------------------------------------------------
