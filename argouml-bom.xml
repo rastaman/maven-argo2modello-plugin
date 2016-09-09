@@ -4,19 +4,19 @@
 	<modelVersion>4.0.0</modelVersion>
 	<groupId>org.argouml</groupId>
 	<artifactId>argouml-bom</artifactId>
-	<version>0.35.1-SNAPSHOT</version>
+	<version>0.35.2-SNAPSHOT</version>
 	<packaging>pom</packaging>
 	<dependencyManagement>
 		<dependencies>
 			<dependency>
 				<groupId>org.argouml</groupId>
-				<version>0.35.1-SNAPSHOT</version>
+				<version>0.35.2-SNAPSHOT</version>
 				<artifactId>argouml</artifactId>
 			</dependency>
 			<dependency>
 				<groupId>org.argouml</groupId>
 				<artifactId>argouml-model</artifactId>
-				<version>0.35.1-SNAPSHOT</version>
+				<version>0.35.2-SNAPSHOT</version>
 				<scope>compile</scope>
 			</dependency>
 			<dependency>
@@ -77,7 +77,7 @@
 			<dependency>
 				<groupId>org.argouml</groupId>
 				<artifactId>argouml-mdr</artifactId>
-				<version>0.35.1-SNAPSHOT</version>
+				<version>0.35.2-SNAPSHOT</version>
 			</dependency>
 			<dependency>
 				<groupId>org.argouml</groupId>

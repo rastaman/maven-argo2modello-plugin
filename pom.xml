@@ -25,8 +25,8 @@
         <artifactId>maven-compiler-plugin</artifactId>
         <version>2.5.1</version>
         <configuration>
-            <source>1.8</source>
-            <target>1.8</target>
+          <source>1.8</source>
+          <target>1.8</target>
         </configuration>
       </plugin>
       <plugin>
@@ -42,6 +42,28 @@
           <excludes>
             <exclude>**/TifConvertTest.java</exclude>
           </excludes>
+        </configuration>
+      </plugin>
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-plugin-plugin</artifactId>
+        <version>3.5</version>
+        <executions>
+          <execution>
+            <id>default-descriptor</id>
+            <phase>process-classes</phase>
+          </execution>
+          <!-- if you want to generate help goal -->
+          <execution>
+            <id>help-goal</id>
+            <goals>
+              <goal>helpmojo</goal>
+            </goals>
+          </execution>
+        </executions>
+        <configuration>
+          <!-- See https://issues.apache.org/jira/browse/MPLUGIN-269 -->
+
         </configuration>
       </plugin>
     </plugins>
@@ -66,6 +88,7 @@
       <groupId>org.codehaus.modello</groupId>
       <artifactId>modello-maven-plugin</artifactId>
       <version>${modello.version}</version>
+      <type>maven-plugin</type>
     </dependency>
     <!-- Other deps -->
     <dependency>
@@ -103,6 +126,19 @@
       <groupId>org.codehaus.modello</groupId>
       <artifactId>modello-plugin-xpp3</artifactId>
       <version>1.8.4-SNAPSHOT</version>
+    </dependency>
+    <!-- Maven -->
+    <dependency>
+      <groupId>org.apache.maven.plugin-tools</groupId>
+      <artifactId>maven-plugin-annotations</artifactId>
+      <version>3.5</version>
+      <scope>provided</scope><!-- annotations are needed only to build the 
+        plugin -->
+    </dependency>
+    <dependency>
+      <groupId>com.google.code.findbugs</groupId>
+      <artifactId>jsr305</artifactId>
+      <version>3.0.1</version>
     </dependency>
   </dependencies>
   <distributionManagement>

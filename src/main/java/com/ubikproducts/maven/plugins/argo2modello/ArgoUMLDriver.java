@@ -5,8 +5,12 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Optional;
 import java.util.Set;
 
+import javax.annotation.Nullable;
+
+import org.apache.log4j.Logger;
 import org.apache.maven.plugin.MojoExecutionException;
 import org.argouml.kernel.Project;
 import org.argouml.model.CoreHelper;
@@ -25,6 +29,8 @@ import org.argouml.support.GeneratorJava2;
 
 public class ArgoUMLDriver {
 
+    private Logger LOGGER = Logger.getLogger(ArgoUMLDriver.class);
+
     private ProfileManagerImpl profileManagerImpl;
 
     private final GeneratorJava2 generator;
@@ -36,6 +42,7 @@ public class ArgoUMLDriver {
     private ArgoUMLDriver() {
         generator = new GeneratorJava2();
     }
+
     /**
      * The default implementation to start.
      */
@@ -47,8 +54,7 @@ public class ArgoUMLDriver {
         initializeModelImplementation(modelImplementationClassname);
     }
 
-    private void initializeModelImplementation(
-            String className) {
+    private void initializeModelImplementation(String className) {
         try {
             ModelImplementation modelImplementation = (ModelImplementation) Class.forName(className).newInstance();
             Model.setImplementation(modelImplementation);
@@ -72,36 +78,45 @@ public class ArgoUMLDriver {
     }
 
     private void clearProfils() {
-        for ( String searchPath : profileManagerImpl.getSearchPathDirectories() ) {
+        List<String> searchPathDirectories = new ArrayList<>(profileManagerImpl.getSearchPathDirectories());
+        for (String searchPath : searchPathDirectories) {
             profileManagerImpl.removeSearchPathDirectory(searchPath);
         }
     }
 
     /**
      * Load all the profils registered.
-     * <p>This always force reinitialization of the Profil subsystem
-     * by clearing the search path folders list.
+     * <p>
+     * This always force reinitialization of the Profil subsystem by clearing
+     * the search path folders list.
      */
     private void loadProfils() {
         clearProfils();
         if (javaProfile != null) {
             loadProfil(javaProfile);
         }
-        if (profilsFolders != null) {
+        if (profilsFolders != null && !profilsFolders.isEmpty()) {
             profilsFolders.stream().forEachOrdered(s -> {
-                File profilFile = getFileForProfil(s);
-                loadProfil(profilFile);
+                Optional<File> profilFile = getFileForProfil(s);
+                if (!profilFile.isPresent()) {
+                    LOGGER.error(String.format("Cannot load profile for %s", s));
+                } else {
+                    profilFile.ifPresent(this::loadProfil);
+                }
             });
         }
         profileManagerImpl.refreshRegisteredProfiles();
         ProfileFacade.setManager(profileManagerImpl);
     }
 
-    private File getFileForProfil(String filename) {
+    private Optional<File> getFileForProfil(String filename) {
+        if (filename == null) {
+            return Optional.empty();
+        }
         if (filename.startsWith("/")) {
-            return new File(filename);
+            return Optional.of(new File(filename));
         } else {
-            return new File(".", filename);
+            return Optional.of(new File(".", filename));
         }
     }
 
@@ -170,8 +185,10 @@ public class ArgoUMLDriver {
             return this;
         }
 
-        public ArgoUMLDriverBuilder withProfileFolder(String profileFolder) {
-            argoUMLDriver.profilsFolders.add(profileFolder);
+        public ArgoUMLDriverBuilder withProfileFolder(@Nullable String profileFolder) {
+            if (profileFolder != null) {
+                argoUMLDriver.profilsFolders.add(profileFolder);
+            }
             return this;
         }
 
